@@ -846,6 +846,7 @@ type SDKAuthResponse struct {
 	RefreshToken string `json:"refresh_token"`
 	ExpiresAt string `json:"expires_at"`
 	Customer SDKAuthCustomerInfo `json:"customer"`
+	CheckoutUrl string `json:"checkout_url,omitempty"`
 }
 
 
@@ -921,6 +922,9 @@ type SDKRegisterRequest struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
 	Name string `json:"name,omitempty"`
+	PriceNickname string `json:"price_nickname,omitempty"`
+	SuccessUrl string `json:"success_url,omitempty"`
+	CancelUrl string `json:"cancel_url,omitempty"`
 }
 
 
