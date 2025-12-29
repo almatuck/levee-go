@@ -1442,6 +1442,7 @@ All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 | `Auth.ForgotPassword(ctx, *SDKForgotPasswordRequest)` | Initiate password reset |
 | `Auth.ResetPassword(ctx, *SDKResetPasswordRequest)` | Complete password reset |
 | `Auth.VerifyEmail(ctx, *SDKVerifyEmailRequest)` | Verify email address |
+| `Auth.ChangePassword(ctx, *SDKChangePasswordRequest)` | Change password while logged in |
 | **Billing** | |
 | `Billing.CreateCustomer(ctx, *CustomerRequest)` | Create billing customer |
 | `Billing.CreateCheckoutSession(ctx, *CheckoutRequest)` | Create Stripe checkout |
@@ -1469,6 +1470,8 @@ All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 | `Customers.ListCustomerOrders(ctx, email, limit)` | List orders |
 | `Customers.ListCustomerSubscriptions(ctx, email)` | List subscriptions |
 | `Customers.ListCustomerPayments(ctx, email, limit)` | List payments |
+| `Customers.UpdateCustomer(ctx, id, *SDKUpdateCustomerRequest)` | Update customer profile |
+| `Customers.DeleteCustomer(ctx, id)` | Delete customer (GDPR) |
 | **Emails** | |
 | `Emails.SendEmail(ctx, *SendEmailRequest)` | Send transactional email |
 | `Emails.GetEmailStatus(ctx, messageID)` | Get email delivery status |
