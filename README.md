@@ -217,6 +217,24 @@ if err != nil {
 log.Printf("Email verified: %v", resp.Success)
 ```
 
+### Change Password
+
+Change a customer's password while logged in (requires current password verification).
+
+```go
+resp, err := client.Auth.ChangePassword(ctx, &levee.SDKChangePasswordRequest{
+    OrgSlug:         "my-org",
+    Email:           "user@example.com",
+    CurrentPassword: "oldpassword123",
+    NewPassword:     "newpassword456",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Password changed: %v", resp.Success)
+```
+
 ---
 
 ## Embedded HTTP Handlers
@@ -1012,6 +1030,38 @@ for _, p := range payments.Payments {
         log.Printf("  Receipt: %s", p.ReceiptUrl)
     }
 }
+```
+
+### Update Customer
+
+Update a customer's profile information (name, phone, avatar, status, metadata).
+
+```go
+customer, err := client.Customers.UpdateCustomer(ctx, "customer-uuid", &levee.SDKUpdateCustomerRequest{
+    Name:      "John Doe",
+    Phone:     "+1-555-1234",
+    AvatarUrl: "https://example.com/avatar.jpg",
+    Status:    "active",
+    Metadata:  `{"plan": "pro", "source": "website"}`,
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Updated customer: %s (%s)", customer.Name, customer.Email)
+```
+
+### Delete Customer
+
+Permanently delete a customer (GDPR compliance - hard delete).
+
+```go
+resp, err := client.Customers.DeleteCustomer(ctx, "customer-uuid")
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Customer deleted: %v", resp.Success)
 ```
 
 ---

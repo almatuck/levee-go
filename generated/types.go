@@ -849,6 +849,15 @@ type SDKAuthResponse struct {
 }
 
 
+// SDKChangePasswordRequest represents the SDKChangePasswordRequest type.
+type SDKChangePasswordRequest struct {
+	OrgSlug string `json:"org_slug"`
+	Email string `json:"email"`
+	CurrentPassword string `json:"current_password"`
+	NewPassword string `json:"new_password"`
+}
+
+
 // SDKContactInfo represents the SDKContactInfo type.
 type SDKContactInfo struct {
 	ID string `json:"id"`
@@ -940,6 +949,16 @@ type SDKSiteSettings struct {
 	MetaTitleTemplate string `json:"meta_title_template,omitempty"`
 	MetaDescription string `json:"meta_description,omitempty"`
 	OgImageUrl string `json:"og_image_url,omitempty"`
+}
+
+
+// SDKUpdateCustomerRequest represents the SDKUpdateCustomerRequest type.
+type SDKUpdateCustomerRequest struct {
+	Name string `json:"name,omitempty"`
+	Phone string `json:"phone,omitempty"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	Status string `json:"status,omitempty"`
+	Metadata string `json:"metadata,omitempty"`
 }
 
 
