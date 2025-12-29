@@ -851,7 +851,6 @@ type SDKAuthResponse struct {
 
 // SDKChangePasswordRequest represents the SDKChangePasswordRequest type.
 type SDKChangePasswordRequest struct {
-	OrgSlug string `json:"org_slug"`
 	Email string `json:"email"`
 	CurrentPassword string `json:"current_password"`
 	NewPassword string `json:"new_password"`
@@ -900,14 +899,12 @@ type SDKCustomerInfo struct {
 
 // SDKForgotPasswordRequest represents the SDKForgotPasswordRequest type.
 type SDKForgotPasswordRequest struct {
-	OrgSlug string `json:"org_slug"`
 	Email string `json:"email"`
 }
 
 
 // SDKLoginRequest represents the SDKLoginRequest type.
 type SDKLoginRequest struct {
-	OrgSlug string `json:"org_slug"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 }
@@ -921,7 +918,6 @@ type SDKRefreshTokenRequest struct {
 
 // SDKRegisterRequest represents the SDKRegisterRequest type.
 type SDKRegisterRequest struct {
-	OrgSlug string `json:"org_slug"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 	Name string `json:"name,omitempty"`
