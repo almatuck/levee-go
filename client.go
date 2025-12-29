@@ -46,46 +46,47 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
+
+	// Orders provides access to orders resources.
+	Orders *OrdersResource
 	// Auth provides access to auth resources.
 	Auth *AuthResource
-	// Billing provides access to billing resources.
-	Billing *BillingResource
-	// Contacts provides access to contacts resources.
-	Contacts *ContactsResource
-	// Content provides access to content resources.
-	Content *ContentResource
-	// Customers provides access to customers resources.
-	Customers *CustomersResource
-	// Emails provides access to emails resources.
-	Emails *EmailsResource
 	// Events provides access to events resources.
 	Events *EventsResource
 	// Funnels provides access to funnels resources.
 	Funnels *FunnelsResource
 	// Lists provides access to lists resources.
 	Lists *ListsResource
-	// Llm provides access to llm resources.
-	Llm *LlmResource
-	// Offers provides access to offers resources.
-	Offers *OffersResource
-	// Orders provides access to orders resources.
-	Orders *OrdersResource
 	// Products provides access to products resources.
 	Products *ProductsResource
-	// Quizzes provides access to quizzes resources.
-	Quizzes *QuizzesResource
+	// Workshops provides access to workshops resources.
+	Workshops *WorkshopsResource
+	// Billing provides access to billing resources.
+	Billing *BillingResource
+	// Content provides access to content resources.
+	Content *ContentResource
 	// Sequences provides access to sequences resources.
 	Sequences *SequencesResource
-	// Site provides access to site resources.
-	Site *SiteResource
-	// Stats provides access to stats resources.
-	Stats *StatsResource
+	// Offers provides access to offers resources.
+	Offers *OffersResource
+	// Quizzes provides access to quizzes resources.
+	Quizzes *QuizzesResource
+	// Customers provides access to customers resources.
+	Customers *CustomersResource
+	// Llm provides access to llm resources.
+	Llm *LlmResource
 	// Tracking provides access to tracking resources.
 	Tracking *TrackingResource
 	// Webhooks provides access to webhooks resources.
 	Webhooks *WebhooksResource
-	// Workshops provides access to workshops resources.
-	Workshops *WorkshopsResource
+	// Emails provides access to emails resources.
+	Emails *EmailsResource
+	// Contacts provides access to contacts resources.
+	Contacts *ContactsResource
+	// Site provides access to site resources.
+	Site *SiteResource
+	// Stats provides access to stats resources.
+	Stats *StatsResource
 }
 
 // NewClient creates a new Levee API client.
@@ -106,26 +107,27 @@ func NewClient(apiKey string, opts ...ClientOption) (*Client, error) {
 		opt(c)
 	}
 
+
+	c.Orders = &OrdersResource{client: c}
 	c.Auth = &AuthResource{client: c}
-	c.Billing = &BillingResource{client: c}
-	c.Contacts = &ContactsResource{client: c}
-	c.Content = &ContentResource{client: c}
-	c.Customers = &CustomersResource{client: c}
-	c.Emails = &EmailsResource{client: c}
 	c.Events = &EventsResource{client: c}
 	c.Funnels = &FunnelsResource{client: c}
 	c.Lists = &ListsResource{client: c}
-	c.Llm = &LlmResource{client: c}
-	c.Offers = &OffersResource{client: c}
-	c.Orders = &OrdersResource{client: c}
 	c.Products = &ProductsResource{client: c}
-	c.Quizzes = &QuizzesResource{client: c}
+	c.Workshops = &WorkshopsResource{client: c}
+	c.Billing = &BillingResource{client: c}
+	c.Content = &ContentResource{client: c}
 	c.Sequences = &SequencesResource{client: c}
-	c.Site = &SiteResource{client: c}
-	c.Stats = &StatsResource{client: c}
+	c.Offers = &OffersResource{client: c}
+	c.Quizzes = &QuizzesResource{client: c}
+	c.Customers = &CustomersResource{client: c}
+	c.Llm = &LlmResource{client: c}
 	c.Tracking = &TrackingResource{client: c}
 	c.Webhooks = &WebhooksResource{client: c}
-	c.Workshops = &WorkshopsResource{client: c}
+	c.Emails = &EmailsResource{client: c}
+	c.Contacts = &ContactsResource{client: c}
+	c.Site = &SiteResource{client: c}
+	c.Stats = &StatsResource{client: c}
 
 	return c, nil
 }

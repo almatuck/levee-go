@@ -823,92 +823,38 @@ type Response struct {
 }
 
 
+// ResumeSequenceRequest represents the ResumeSequenceRequest type.
+type ResumeSequenceRequest struct {
+	Email string `json:"email"`
+	SequenceSlug string `json:"sequence_slug"`
+}
+
+
 // SDKAuthCustomerInfo represents the SDKAuthCustomerInfo type.
 type SDKAuthCustomerInfo struct {
-	ID            string `json:"id"`
-	Email         string `json:"email"`
-	Name          string `json:"name,omitempty"`
-	EmailVerified bool   `json:"email_verified"`
-	CreatedAt     string `json:"created_at"`
+	ID string `json:"id"`
+	Email string `json:"email"`
+	Name string `json:"name,omitempty"`
+	EmailVerified bool `json:"email_verified"`
+	CreatedAt string `json:"created_at"`
 }
 
 
 // SDKAuthResponse represents the SDKAuthResponse type.
 type SDKAuthResponse struct {
-	Token        string              `json:"token"`
-	RefreshToken string              `json:"refresh_token"`
-	ExpiresAt    string              `json:"expires_at"`
-	Customer     SDKAuthCustomerInfo `json:"customer"`
-}
-
-
-// SDKForgotPasswordRequest represents the SDKForgotPasswordRequest type.
-type SDKForgotPasswordRequest struct {
-	OrgSlug string `json:"org_slug"`
-	Email   string `json:"email"`
-}
-
-
-// SDKLoginRequest represents the SDKLoginRequest type.
-type SDKLoginRequest struct {
-	OrgSlug  string `json:"org_slug"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-
-// SDKRefreshTokenRequest represents the SDKRefreshTokenRequest type.
-type SDKRefreshTokenRequest struct {
-	RefreshToken string `json:"refresh_token"`
-}
-
-
-// SDKRegisterRequest represents the SDKRegisterRequest type.
-type SDKRegisterRequest struct {
-	OrgSlug  string `json:"org_slug"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name,omitempty"`
-}
-
-
-// SDKResetPasswordRequest represents the SDKResetPasswordRequest type.
-type SDKResetPasswordRequest struct {
-	Token           string `json:"token"`
-	Password        string `json:"password"`
-	ConfirmPassword string `json:"confirm_password"`
-}
-
-
-// SDKVerifyEmailRequest represents the SDKVerifyEmailRequest type.
-type SDKVerifyEmailRequest struct {
 	Token string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresAt string `json:"expires_at"`
+	Customer SDKAuthCustomerInfo `json:"customer"`
 }
 
 
 // SDKChangePasswordRequest represents the SDKChangePasswordRequest type.
 type SDKChangePasswordRequest struct {
-	OrgSlug         string `json:"org_slug"`
-	Email           string `json:"email"`
-	CurrentPassword string `json:"current_password"`
-	NewPassword     string `json:"new_password"`
-}
-
-
-// SDKUpdateCustomerRequest represents the SDKUpdateCustomerRequest type.
-type SDKUpdateCustomerRequest struct {
-	Name      string `json:"name,omitempty"`
-	Phone     string `json:"phone,omitempty"`
-	AvatarUrl string `json:"avatar_url,omitempty"`
-	Status    string `json:"status,omitempty"`
-	Metadata  string `json:"metadata,omitempty"`
-}
-
-
-// ResumeSequenceRequest represents the ResumeSequenceRequest type.
-type ResumeSequenceRequest struct {
+	OrgSlug string `json:"org_slug"`
 	Email string `json:"email"`
-	SequenceSlug string `json:"sequence_slug"`
+	CurrentPassword string `json:"current_password"`
+	NewPassword string `json:"new_password"`
 }
 
 
@@ -952,6 +898,44 @@ type SDKCustomerInfo struct {
 }
 
 
+// SDKForgotPasswordRequest represents the SDKForgotPasswordRequest type.
+type SDKForgotPasswordRequest struct {
+	OrgSlug string `json:"org_slug"`
+	Email string `json:"email"`
+}
+
+
+// SDKLoginRequest represents the SDKLoginRequest type.
+type SDKLoginRequest struct {
+	OrgSlug string `json:"org_slug"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
+
+// SDKRefreshTokenRequest represents the SDKRefreshTokenRequest type.
+type SDKRefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+
+// SDKRegisterRequest represents the SDKRegisterRequest type.
+type SDKRegisterRequest struct {
+	OrgSlug string `json:"org_slug"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+	Name string `json:"name,omitempty"`
+}
+
+
+// SDKResetPasswordRequest represents the SDKResetPasswordRequest type.
+type SDKResetPasswordRequest struct {
+	Token string `json:"token"`
+	Password string `json:"password"`
+	ConfirmPassword string `json:"confirm_password"`
+}
+
+
 // SDKSiteSettings represents the SDKSiteSettings type.
 type SDKSiteSettings struct {
 	SiteName string `json:"site_name,omitempty"`
@@ -965,6 +949,22 @@ type SDKSiteSettings struct {
 	MetaTitleTemplate string `json:"meta_title_template,omitempty"`
 	MetaDescription string `json:"meta_description,omitempty"`
 	OgImageUrl string `json:"og_image_url,omitempty"`
+}
+
+
+// SDKUpdateCustomerRequest represents the SDKUpdateCustomerRequest type.
+type SDKUpdateCustomerRequest struct {
+	Name string `json:"name,omitempty"`
+	Phone string `json:"phone,omitempty"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	Status string `json:"status,omitempty"`
+	Metadata string `json:"metadata,omitempty"`
+}
+
+
+// SDKVerifyEmailRequest represents the SDKVerifyEmailRequest type.
+type SDKVerifyEmailRequest struct {
+	Token string `json:"token"`
 }
 
 
