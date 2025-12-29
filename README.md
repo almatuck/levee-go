@@ -131,7 +131,6 @@ The Auth resource provides customer authentication for your application. This en
 
 ```go
 resp, err := client.Auth.Register(ctx, &levee.SDKRegisterRequest{
-    OrgSlug:  "your-org",
     Email:    "user@example.com",
     Password: "securepassword123",
     Name:     "John Doe",
@@ -149,7 +148,6 @@ log.Printf("Refresh token: %s", resp.RefreshToken)
 
 ```go
 resp, err := client.Auth.Login(ctx, &levee.SDKLoginRequest{
-    OrgSlug:  "your-org",
     Email:    "user@example.com",
     Password: "securepassword123",
 })
@@ -179,8 +177,7 @@ log.Printf("New refresh token: %s", resp.RefreshToken)
 
 ```go
 resp, err := client.Auth.ForgotPassword(ctx, &levee.SDKForgotPasswordRequest{
-    OrgSlug: "your-org",
-    Email:   "user@example.com",
+    Email: "user@example.com",
 })
 if err != nil {
     log.Fatal(err)
@@ -223,7 +220,6 @@ Change a customer's password while logged in (requires current password verifica
 
 ```go
 resp, err := client.Auth.ChangePassword(ctx, &levee.SDKChangePasswordRequest{
-    OrgSlug:         "my-org",
     Email:           "user@example.com",
     CurrentPassword: "oldpassword123",
     NewPassword:     "newpassword456",
