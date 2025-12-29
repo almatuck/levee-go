@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package llm;
+
+option go_package = "github.com/almatuck/levee-go/llmpb";
+
+// LLMService provides bidirectional streaming for LLM chat completions.
+// Used by SDK clients to interact with org-configured LLM providers.
+service LLMService {
+  // Chat performs a bidirectional streaming chat session.
+  // Client sends messages, server streams back tokens/responses.
+  rpc Chat(stream ChatRequest) returns (stream ChatResponse);
+
+  // SimpleChat is a unary RPC for simple request/response without streaming.
+  rpc SimpleChat(SimpleChatRequest) returns (SimpleChatResponse);
+}
+
+// ChatRequest is sent from client to server during a streaming session.
+message ChatRequest {
+  oneof request {
+    // Initial request to start a chat
+    StartChatRequest start = 1;
+
+    // Send a user message during the conversation
+    UserMessage message = 2;
+
+    // Abort the current generation
+    AbortRequest abort = 3;
+
+    // Provide tool results (for function calling)
+    ToolResult tool_result = 4;
+  }
+}
+
+// StartChatRequest initializes a chat session.
+message StartChatRequest {
+  // API key for authentication (X-API-Key)
+  string api_key = 1;
+
+  // System prompt for the conversation
+  string system_prompt = 2;
+
+  // Model tier: "haiku", "sonnet", "opus"
+  string model = 3;
+
+  // Maximum tokens to generate
+  int32 max_tokens = 4;
+
+  // Temperature (0.0-1.0)
+  float temperature = 5;
+
+  // Initial messages for context (optional)
+  repeated Message messages = 6;
+
+  // Tools available for function calling (optional)
+  repeated ToolDefinition tools = 7;
+
+  // Unique request ID for tracking
+  string request_id = 8;
+}
+
+// UserMessage sends a message from the user.
+message UserMessage {
+  string content = 1;
+}
+
+// AbortRequest aborts the current generation.
+message AbortRequest {
+  string reason = 1;
+}
+
+// ToolResult provides the result of a tool call.
+message ToolResult {
+  string tool_call_id = 1;
+  string result = 2;
+  bool is_error = 3;
+}
+
+// Message represents a conversation message.
+message Message {
+  string role = 1;  // "user", "assistant", "system"
+  string content = 2;
+  repeated ToolCall tool_calls = 3;
+}
+
+// ToolDefinition defines a tool for function calling.
+message ToolDefinition {
+  string name = 1;
+  string description = 2;
+  string parameters_json = 3;  // JSON schema for parameters
+}
+
+// ToolCall represents an LLM-generated tool call.
+message ToolCall {
+  string id = 1;
+  string name = 2;
+  string arguments_json = 3;
+}
+
+// ChatResponse is streamed from server to client.
+message ChatResponse {
+  oneof response {
+    // Session started successfully
+    SessionStarted session_started = 1;
+
+    // Content chunk (streamed tokens)
+    ContentChunk chunk = 2;
+
+    // Tool call requested by the LLM
+    ToolCallRequest tool_call = 3;
+
+    // Generation complete
+    CompletionResponse completion = 4;
+
+    // Error occurred
+    ErrorResponse error = 5;
+
+    // Generation aborted (ack of AbortRequest)
+    AbortedResponse aborted = 6;
+  }
+}
+
+// SessionStarted confirms the session was initialized.
+message SessionStarted {
+  string session_id = 1;
+  string provider = 2;
+  string model = 3;
+}
+
+// ContentChunk streams generated content.
+message ContentChunk {
+  string content = 1;
+  int32 index = 2;  // Chunk index for ordering
+}
+
+// ToolCallRequest indicates the LLM wants to call a tool.
+message ToolCallRequest {
+  string tool_call_id = 1;
+  string name = 2;
+  string arguments_json = 3;
+}
+
+// CompletionResponse indicates generation is complete.
+message CompletionResponse {
+  string full_content = 1;
+  string stop_reason = 2;
+  int64 input_tokens = 3;
+  int64 output_tokens = 4;
+  double cost_usd = 5;
+  int64 latency_ms = 6;
+}
+
+// ErrorResponse indicates an error occurred.
+message ErrorResponse {
+  string code = 1;
+  string message = 2;
+  bool retryable = 3;
+}
+
+// AbortedResponse confirms the generation was aborted.
+message AbortedResponse {
+  string reason = 1;
+}
+
+// SimpleChatRequest for unary RPC (non-streaming).
+message SimpleChatRequest {
+  string api_key = 1;
+  repeated Message messages = 2;
+  string system_prompt = 3;
+  string model = 4;
+  int32 max_tokens = 5;
+  float temperature = 6;
+  string request_id = 7;
+}
+
+// SimpleChatResponse for unary RPC.
+message SimpleChatResponse {
+  string content = 1;
+  string model = 2;
+  int64 input_tokens = 3;
+  int64 output_tokens = 4;
+  double cost_usd = 5;
+  int64 latency_ms = 6;
+  string stop_reason = 7;
+}
