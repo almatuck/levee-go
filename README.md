@@ -7,6 +7,7 @@ Official Go SDK for integrating [Levee](https://levee.com) into your Go applicat
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
+- [Authentication](#authentication)
 - [Embedded HTTP Handlers](#embedded-http-handlers)
 - [LLM/AI Chat](#llmai-chat)
 - [Content/CMS](#contentcms)
@@ -118,6 +119,102 @@ client, err := levee.NewClient("lv_your_api_key",
 client, err := levee.NewClient("lv_your_api_key",
     levee.WithTimeout(60 * time.Second),
 )
+```
+
+---
+
+## Authentication
+
+The Auth resource provides customer authentication for your application. This enables end-user login/registration flows for your SaaS application.
+
+### Register a Customer
+
+```go
+resp, err := client.Auth.Register(ctx, &levee.SDKRegisterRequest{
+    OrgSlug:  "your-org",
+    Email:    "user@example.com",
+    Password: "securepassword123",
+    Name:     "John Doe",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Registered user: %s", resp.Customer.Email)
+log.Printf("Access token: %s", resp.Token)
+log.Printf("Refresh token: %s", resp.RefreshToken)
+```
+
+### Login
+
+```go
+resp, err := client.Auth.Login(ctx, &levee.SDKLoginRequest{
+    OrgSlug:  "your-org",
+    Email:    "user@example.com",
+    Password: "securepassword123",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Logged in: %s", resp.Customer.Email)
+log.Printf("Token expires at: %s", resp.ExpiresAt)
+```
+
+### Refresh Token
+
+```go
+resp, err := client.Auth.RefreshToken(ctx, &levee.SDKRefreshTokenRequest{
+    RefreshToken: "existing_refresh_token",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("New access token: %s", resp.Token)
+log.Printf("New refresh token: %s", resp.RefreshToken)
+```
+
+### Forgot Password
+
+```go
+resp, err := client.Auth.ForgotPassword(ctx, &levee.SDKForgotPasswordRequest{
+    OrgSlug: "your-org",
+    Email:   "user@example.com",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Password reset email sent: %v", resp.Success)
+```
+
+### Reset Password
+
+```go
+resp, err := client.Auth.ResetPassword(ctx, &levee.SDKResetPasswordRequest{
+    Token:           "reset_token_from_email",
+    Password:        "newpassword123",
+    ConfirmPassword: "newpassword123",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Password reset: %v", resp.Success)
+```
+
+### Verify Email
+
+```go
+resp, err := client.Auth.VerifyEmail(ctx, &levee.SDKVerifyEmailRequest{
+    Token: "verification_token_from_email",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+log.Printf("Email verified: %v", resp.Success)
 ```
 
 ---
@@ -239,23 +336,23 @@ The handlers forward events to Levee API for processing while serving tracking p
 The embedded handlers make Levee completely invisible to your end users:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  Your App (brandivize.com)                                      │
-│                                                                 │
-│  ┌─────────────────┐    ┌──────────────────────────────────┐   │
-│  │ Your Routes     │    │ Levee SDK Handlers               │   │
-│  │ /               │    │ /levee/e/o/:token → serves GIF   │   │
-│  │ /dashboard      │    │ /levee/e/c/:token → redirects    │   │
-│  │ /api/*          │    │ /levee/e/u/:token → unsubscribe  │   │
-│  └─────────────────┘    │ /levee/webhooks/* → forwards     │   │
-│                         └──────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼ (async forwarding)
-                         ┌─────────────────────┐
-                         │  Levee API          │
-                         │  levee.com/sdk/v1/* │
-                         └─────────────────────┘
++----------------------------------------------------------------+
+|  Your App (brandivize.com)                                     |
+|                                                                |
+|  +---------------+    +--------------------------------+       |
+|  | Your Routes   |    | Levee SDK Handlers             |       |
+|  | /             |    | /levee/e/o/:token -> serves GIF|       |
+|  | /dashboard    |    | /levee/e/c/:token -> redirects |       |
+|  | /api/*        |    | /levee/e/u/:token -> unsubscribe|      |
+|  +---------------+    | /levee/webhooks/* -> forwards  |       |
+|                       +--------------------------------+       |
++----------------------------------------------------------------+
+                                    |
+                                    v (async forwarding)
+                         +---------------------+
+                         |  Levee API          |
+                         |  levee.com/sdk/v1/* |
+                         +---------------------+
 ```
 
 - **Email opens**: GIF served locally, open recorded asynchronously
@@ -449,10 +546,10 @@ Access site settings, navigation menus, and author information for building your
 settings, err := client.Site.GetSiteSettings(ctx)
 
 log.Printf("Site: %s - %s", settings.SiteName, settings.Tagline)
-log.Printf("Logo: %s", settings.LogoURL)
+log.Printf("Logo: %s", settings.LogoUrl)
 log.Printf("Contact: %s", settings.ContactEmail)
 log.Printf("Social: %v", settings.SocialLinks) // map[string]string
-log.Printf("Default Meta: %s", settings.DefaultMetaTitle)
+log.Printf("Default Meta: %s", settings.MetaTitleTemplate)
 ```
 
 ### List Navigation Menus
@@ -467,9 +564,9 @@ menus, err := client.Site.ListNavigationMenus(ctx, "header")
 for _, menu := range menus.Menus {
     log.Printf("Menu: %s (%s)", menu.Name, menu.Location)
     for _, item := range menu.Items {
-        log.Printf("  - %s: %s", item.Label, item.URL)
+        log.Printf("  - %s: %s", item.Label, item.Url)
         for _, child := range item.Children {
-            log.Printf("    - %s: %s", child.Label, child.URL)
+            log.Printf("    - %s: %s", child.Label, child.Url)
         }
     }
 }
@@ -481,7 +578,7 @@ for _, menu := range menus.Menus {
 menu, err := client.Site.GetNavigationMenu(ctx, "main-nav")
 
 for _, item := range menu.Items {
-    log.Printf("%s -> %s", item.Label, item.URL)
+    log.Printf("%s -> %s", item.Label, item.Url)
 }
 ```
 
@@ -502,7 +599,7 @@ author, err := client.Site.GetAuthor(ctx, "author-123")
 
 log.Printf("Name: %s", author.DisplayName)
 log.Printf("Bio: %s", author.Bio)
-log.Printf("Avatar: %s", author.AvatarURL)
+log.Printf("Avatar: %s", author.AvatarUrl)
 log.Printf("Twitter: @%s", author.TwitterHandle)
 ```
 
@@ -539,7 +636,7 @@ contact, err := client.Contacts.UpdateContact(ctx, "user@example.com", &levee.Up
     Name:    "John Smith",
     Phone:   "+1-555-123-4567",
     Company: "Acme Inc",
-    Meta: map[string]string{
+    CustomFields: map[string]string{
         "plan": "enterprise",
     },
 })
@@ -774,8 +871,9 @@ Access funnel step information for multi-step sales processes.
 ```go
 step, err := client.Funnels.GetFunnelStep(ctx, "onboarding-step-1")
 
-log.Printf("Step: %s", step.Name)
-log.Printf("Next step: %s", step.NextStepSlug)
+log.Printf("Step: %s", step.Title)
+log.Printf("Type: %s", step.StepType)
+log.Printf("Next step ID: %d", step.NextStepID)
 ```
 
 ---
@@ -789,9 +887,9 @@ Access and submit quizzes for lead qualification or assessments.
 ```go
 quiz, err := client.Quizzes.GetQuiz(ctx, "product-fit")
 
-log.Printf("Quiz: %s", quiz.Name)
+log.Printf("Quiz: %s", quiz.Title)
 for _, q := range quiz.Questions {
-    log.Printf("  Q: %s", q.Text)
+    log.Printf("  Q: %s", q.Question)
 }
 ```
 
@@ -806,7 +904,8 @@ result, err := client.Quizzes.SubmitQuiz(ctx, "product-fit", &levee.QuizSubmitRe
     },
 })
 
-log.Printf("Score: %d, Qualified: %v", result.Score, result.Qualified)
+log.Printf("Segments: %v", result.Segments)
+log.Printf("Redirect: %s", result.RedirectUrl)
 ```
 
 ---
@@ -819,11 +918,13 @@ Process special offers and promotions.
 
 ```go
 result, err := client.Offers.ProcessOffer(ctx, &levee.OfferRequest{
-    Email:     "user@example.com",
-    OfferSlug: "black-friday-2024",
+    SessionID: "checkout_session_id",
+    StepSlug:  "upsell-1",
+    Accept:    true,
 })
 
-log.Printf("Offer applied: %s", result.Status)
+log.Printf("Success: %v", result.Success)
+log.Printf("Next URL: %s", result.NextUrl)
 ```
 
 ---
@@ -837,9 +938,9 @@ Access workshop and event information.
 ```go
 workshop, err := client.Workshops.GetWorkshop(ctx, "intro-webinar")
 
-log.Printf("Workshop: %s", workshop.Name)
-log.Printf("Date: %s", workshop.StartTime)
-log.Printf("Registration URL: %s", workshop.RegistrationUrl)
+log.Printf("Workshop: %s", workshop.Title)
+log.Printf("Date: %s to %s", workshop.StartDate, workshop.EndDate)
+log.Printf("Seats remaining: %d", workshop.SeatsRemaining)
 ```
 
 ### Get Workshop by Product
@@ -847,7 +948,7 @@ log.Printf("Registration URL: %s", workshop.RegistrationUrl)
 ```go
 workshop, err := client.Workshops.GetWorkshopByProduct(ctx, "webinar-product")
 
-log.Printf("Workshop for product: %s", workshop.Name)
+log.Printf("Workshop for product: %s", workshop.Title)
 ```
 
 ---
@@ -872,8 +973,8 @@ log.Printf("Orders: %d, Subscriptions: %d", customer.OrderCount, customer.Subscr
 invoices, err := client.Customers.ListCustomerInvoices(ctx, "user@example.com", 10)
 for _, inv := range invoices.Invoices {
     log.Printf("Invoice #%s: $%.2f %s", inv.Number, float64(inv.AmountPaid)/100, inv.Status)
-    if inv.InvoicePDFURL != "" {
-        log.Printf("  PDF: %s", inv.InvoicePDFURL)
+    if inv.InvoicePdfUrl != "" {
+        log.Printf("  PDF: %s", inv.InvoicePdfUrl)
     }
 }
 ```
@@ -907,8 +1008,8 @@ for _, sub := range subs.Subscriptions {
 payments, err := client.Customers.ListCustomerPayments(ctx, "user@example.com", 20)
 for _, p := range payments.Payments {
     log.Printf("Payment: $%.2f %s via %s", float64(p.AmountCents)/100, p.Status, p.PaymentMethod)
-    if p.ReceiptURL != "" {
-        log.Printf("  Receipt: %s", p.ReceiptURL)
+    if p.ReceiptUrl != "" {
+        log.Printf("  Receipt: %s", p.ReceiptUrl)
     }
 }
 ```
@@ -925,7 +1026,7 @@ Track custom events for analytics, automation triggers, and user behavior analys
 _, err := client.Events.TrackEvent(ctx, &levee.EventRequest{
     Event: "purchase_completed",
     Email: "user@example.com",
-    Properties: map[string]string{
+    Properties: map[string]interface{}{
         "product":  "pro-plan",
         "amount":   "99.00",
         "currency": "usd",
@@ -968,7 +1069,7 @@ checkout, err := client.Billing.CreateCheckoutSession(ctx, &levee.CheckoutReques
 ```go
 sub, err := client.Billing.CreateSubscription(ctx, &levee.SubscriptionRequest{
     CustomerID: "cust_123",
-    PriceID:    "price_xxx",
+    PriceIds:   []string{"price_xxx"},
 })
 ```
 
@@ -1162,7 +1263,7 @@ revenueStats, err := client.Stats.GetRevenueStats(ctx,
 )
 
 log.Printf("Total revenue: $%.2f", float64(revenueStats.TotalRevenue)/100)
-log.Printf("MRR: $%.2f", float64(revenueStats.MRR)/100)
+log.Printf("MRR: $%.2f", float64(revenueStats.Mrr)/100)
 log.Printf("Orders: %d, Subscriptions: %d, Churned: %d",
     revenueStats.TotalOrders, revenueStats.TotalSubscriptions, revenueStats.TotalChurned)
 ```
@@ -1284,6 +1385,20 @@ All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 | `WithBaseURL(url)` | Set custom API base URL |
 | `WithHTTPClient(client)` | Set custom HTTP client |
 | `WithTimeout(duration)` | Set HTTP request timeout |
+| **Auth** | |
+| `Auth.Register(ctx, *SDKRegisterRequest)` | Register a new customer account |
+| `Auth.Login(ctx, *SDKLoginRequest)` | Authenticate and get tokens |
+| `Auth.RefreshToken(ctx, *SDKRefreshTokenRequest)` | Exchange refresh token for new tokens |
+| `Auth.ForgotPassword(ctx, *SDKForgotPasswordRequest)` | Initiate password reset |
+| `Auth.ResetPassword(ctx, *SDKResetPasswordRequest)` | Complete password reset |
+| `Auth.VerifyEmail(ctx, *SDKVerifyEmailRequest)` | Verify email address |
+| **Billing** | |
+| `Billing.CreateCustomer(ctx, *CustomerRequest)` | Create billing customer |
+| `Billing.CreateCheckoutSession(ctx, *CheckoutRequest)` | Create Stripe checkout |
+| `Billing.CreateSubscription(ctx, *SubscriptionRequest)` | Create subscription |
+| `Billing.CancelSubscription(ctx, subscriptionID)` | Cancel subscription |
+| `Billing.RecordUsage(ctx, *UsageRequest)` | Record metered usage |
+| `Billing.GetCustomerPortal(ctx, *PortalRequest)` | Get portal URL |
 | **Contacts** | |
 | `Contacts.CreateContact(ctx, *ContactRequest)` | Create or get a contact |
 | `Contacts.GetContact(ctx, idOrEmail)` | Get contact details |
@@ -1292,46 +1407,63 @@ All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 | `Contacts.RemoveContactTags(ctx, id, *RemoveContactTagsRequest)` | Remove tags from contact |
 | `Contacts.ListContactActivity(ctx, id, limit)` | Get contact activity |
 | `Contacts.GlobalUnsubscribe(ctx, *GlobalUnsubscribeRequest)` | Unsubscribe from all |
-| **Lists** | |
-| `Lists.SubscribeToList(ctx, slug, *SubscribeRequest)` | Subscribe to list |
-| `Lists.UnsubscribeFromList(ctx, slug, *SubscribeRequest)` | Unsubscribe from list |
-| **Emails** | |
-| `Emails.SendEmail(ctx, *SendEmailRequest)` | Send transactional email |
-| `Emails.GetEmailStatus(ctx, messageID)` | Get email delivery status |
-| `Emails.ListEmailEvents(ctx, messageID)` | Get email tracking events |
-| **Sequences** | |
-| `Sequences.EnrollInSequence(ctx, *EnrollSequenceRequest)` | Enroll in sequence |
-| `Sequences.GetSequenceEnrollments(ctx, email, sequenceSlug)` | Get enrollments |
-| `Sequences.UnenrollFromSequence(ctx, *UnenrollSequenceRequest)` | Unenroll from sequence |
-| `Sequences.PauseSequenceEnrollment(ctx, *PauseSequenceRequest)` | Pause enrollment |
-| `Sequences.ResumeSequenceEnrollment(ctx, *ResumeSequenceRequest)` | Resume enrollment |
-| **Orders** | |
-| `Orders.CreateOrder(ctx, *OrderRequest)` | Create checkout session |
+| **Content** | |
+| `Content.ListContentPosts(ctx, page, pageSize, categorySlug)` | List published posts |
+| `Content.GetContentPost(ctx, slug)` | Get post by slug |
+| `Content.ListContentPages(ctx, page, pageSize)` | List published pages |
+| `Content.GetContentPage(ctx, slug)` | Get page by slug |
+| `Content.ListContentCategories(ctx)` | List content categories |
 | **Customers** | |
 | `Customers.GetCustomerByEmail(ctx, email)` | Get customer info |
 | `Customers.ListCustomerInvoices(ctx, email, limit)` | List invoices |
 | `Customers.ListCustomerOrders(ctx, email, limit)` | List orders |
 | `Customers.ListCustomerSubscriptions(ctx, email)` | List subscriptions |
 | `Customers.ListCustomerPayments(ctx, email, limit)` | List payments |
-| **Billing** | |
-| `Billing.CreateCustomer(ctx, *CustomerRequest)` | Create billing customer |
-| `Billing.CreateCheckoutSession(ctx, *CheckoutRequest)` | Create Stripe checkout |
-| `Billing.CreateSubscription(ctx, *SubscriptionRequest)` | Create subscription |
-| `Billing.CancelSubscription(ctx, subscriptionID)` | Cancel subscription |
-| `Billing.RecordUsage(ctx, *UsageRequest)` | Record metered usage |
-| `Billing.GetCustomerPortal(ctx, *PortalRequest)` | Get portal URL |
-| **Products** | |
-| `Products.GetProduct(ctx, slug)` | Get product by slug |
+| **Emails** | |
+| `Emails.SendEmail(ctx, *SendEmailRequest)` | Send transactional email |
+| `Emails.GetEmailStatus(ctx, messageID)` | Get email delivery status |
+| `Emails.ListEmailEvents(ctx, messageID)` | Get email tracking events |
+| **Events** | |
+| `Events.TrackEvent(ctx, *EventRequest)` | Track custom event |
 | **Funnels** | |
 | `Funnels.GetFunnelStep(ctx, slug)` | Get funnel step info |
+| **Lists** | |
+| `Lists.SubscribeToList(ctx, slug, *SubscribeRequest)` | Subscribe to list |
+| `Lists.UnsubscribeFromList(ctx, slug, *SubscribeRequest)` | Unsubscribe from list |
+| **Llm** | |
+| `Llm.Chat(ctx, *LLMChatRequest)` | Simple chat via HTTP |
+| `Llm.Config(ctx)` | Get LLM configuration |
+| **Offers** | |
+| `Offers.ProcessOffer(ctx, *OfferRequest)` | Process an offer |
+| **Orders** | |
+| `Orders.CreateOrder(ctx, *OrderRequest)` | Create checkout session |
+| **Products** | |
+| `Products.GetProduct(ctx, slug)` | Get product by slug |
 | **Quizzes** | |
 | `Quizzes.GetQuiz(ctx, slug)` | Get quiz by slug |
 | `Quizzes.SubmitQuiz(ctx, slug, *QuizSubmitRequest)` | Submit quiz answers |
-| **Offers** | |
-| `Offers.ProcessOffer(ctx, *OfferRequest)` | Process an offer |
-| **Workshops** | |
-| `Workshops.GetWorkshop(ctx, slug)` | Get workshop by slug |
-| `Workshops.GetWorkshopByProduct(ctx, productSlug)` | Get workshop by product |
+| **Sequences** | |
+| `Sequences.EnrollInSequence(ctx, *EnrollSequenceRequest)` | Enroll in sequence |
+| `Sequences.GetSequenceEnrollments(ctx, email, sequenceSlug)` | Get enrollments |
+| `Sequences.UnenrollFromSequence(ctx, *UnenrollSequenceRequest)` | Unenroll from sequence |
+| `Sequences.PauseSequenceEnrollment(ctx, *PauseSequenceRequest)` | Pause enrollment |
+| `Sequences.ResumeSequenceEnrollment(ctx, *ResumeSequenceRequest)` | Resume enrollment |
+| **Site** | |
+| `Site.GetSiteSettings(ctx)` | Get site branding/settings |
+| `Site.ListNavigationMenus(ctx, location)` | List navigation menus |
+| `Site.GetNavigationMenu(ctx, slug)` | Get menu by slug |
+| `Site.ListAuthors(ctx)` | List all authors |
+| `Site.GetAuthor(ctx, id)` | Get author by ID |
+| **Stats** | |
+| `Stats.GetStatsOverview(ctx, startDate, endDate)` | Get overview stats |
+| `Stats.GetEmailStats(ctx, startDate, endDate, groupBy)` | Get email stats |
+| `Stats.GetRevenueStats(ctx, startDate, endDate, groupBy)` | Get revenue stats |
+| `Stats.GetContactStats(ctx, startDate, endDate, groupBy)` | Get contact stats |
+| **Tracking** | |
+| `Tracking.TrackOpen(ctx, *TrackOpenRequest)` | Track email open |
+| `Tracking.TrackClick(ctx, *TrackClickRequest)` | Track link click |
+| `Tracking.TrackUnsubscribe(ctx, *TrackUnsubscribeRequest)` | Track unsubscribe |
+| `Tracking.TrackConfirm(ctx, *TrackConfirmRequest)` | Track email confirmation |
 | **Webhooks** | |
 | `Webhooks.RegisterWebhook(ctx, *RegisterWebhookRequest)` | Register webhook |
 | `Webhooks.ListWebhooks(ctx)` | List webhooks |
@@ -1340,33 +1472,9 @@ All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 | `Webhooks.DeleteWebhook(ctx, webhookID)` | Delete webhook |
 | `Webhooks.TestWebhook(ctx, webhookID)` | Send test event |
 | `Webhooks.ListWebhookLogs(ctx, webhookID, limit)` | Get delivery logs |
-| **Stats** | |
-| `Stats.GetStatsOverview(ctx, startDate, endDate)` | Get overview stats |
-| `Stats.GetEmailStats(ctx, startDate, endDate, groupBy)` | Get email stats |
-| `Stats.GetRevenueStats(ctx, startDate, endDate, groupBy)` | Get revenue stats |
-| `Stats.GetContactStats(ctx, startDate, endDate, groupBy)` | Get contact stats |
-| **Events** | |
-| `Events.TrackEvent(ctx, *EventRequest)` | Track custom event |
-| **Tracking** | |
-| `Tracking.TrackOpen(ctx, *TrackOpenRequest)` | Track email open |
-| `Tracking.TrackClick(ctx, *TrackClickRequest)` | Track link click |
-| `Tracking.TrackUnsubscribe(ctx, *TrackUnsubscribeRequest)` | Track unsubscribe |
-| `Tracking.TrackConfirm(ctx, *TrackConfirmRequest)` | Track email confirmation |
-| **Content** | |
-| `Content.ListContentPosts(ctx, page, pageSize, categorySlug)` | List published posts |
-| `Content.GetContentPost(ctx, slug)` | Get post by slug |
-| `Content.ListContentPages(ctx, page, pageSize)` | List published pages |
-| `Content.GetContentPage(ctx, slug)` | Get page by slug |
-| `Content.ListContentCategories(ctx)` | List content categories |
-| **Site** | |
-| `Site.GetSiteSettings(ctx)` | Get site branding/settings |
-| `Site.ListNavigationMenus(ctx, location)` | List navigation menus |
-| `Site.GetNavigationMenu(ctx, slug)` | Get menu by slug |
-| `Site.ListAuthors(ctx)` | List all authors |
-| `Site.GetAuthor(ctx, id)` | Get author by ID |
-| **Llm** | |
-| `Llm.Chat(ctx, *LLMChatRequest)` | Simple chat via HTTP |
-| `Llm.Config(ctx)` | Get LLM configuration |
+| **Workshops** | |
+| `Workshops.GetWorkshop(ctx, slug)` | Get workshop by slug |
+| `Workshops.GetWorkshopByProduct(ctx, productSlug)` | Get workshop by product |
 | **Embedded Handlers** | |
 | `RegisterHandlers(mux, prefix, opts...)` | Register HTTP handlers on mux |
 | `WithUnsubscribeRedirect(url)` | Set unsubscribe redirect URL |

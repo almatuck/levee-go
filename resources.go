@@ -11,6 +11,114 @@ import (
 )
 
 
+// AuthResource provides access to auth resources.
+type AuthResource struct {
+	client *Client
+}
+
+// Register creates a new customer account.
+func (r *AuthResource) Register(ctx context.Context, request *SDKRegisterRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/register",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// Login authenticates a customer and returns tokens.
+func (r *AuthResource) Login(ctx context.Context, request *SDKLoginRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/login",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// RefreshToken exchanges a refresh token for new access and refresh tokens.
+func (r *AuthResource) RefreshToken(ctx context.Context, request *SDKRefreshTokenRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/refresh",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// ForgotPassword initiates the password reset flow by sending a reset email.
+func (r *AuthResource) ForgotPassword(ctx context.Context, request *SDKForgotPasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/forgot-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// ResetPassword completes the password reset using a token from the reset email.
+func (r *AuthResource) ResetPassword(ctx context.Context, request *SDKResetPasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/reset-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// VerifyEmail confirms the customer's email address using a verification token.
+func (r *AuthResource) VerifyEmail(ctx context.Context, request *SDKVerifyEmailRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/verify-email",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
 // EventsResource provides access to events resources.
 type EventsResource struct {
 	client *Client
