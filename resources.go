@@ -118,6 +118,23 @@ func (r *AuthResource) VerifyEmail(ctx context.Context, request *SDKVerifyEmailR
 	return &result, nil
 }
 
+// ChangePassword changes the customer's password while logged in.
+func (r *AuthResource) ChangePassword(ctx context.Context, request *SDKChangePasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/change-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
 
 // EventsResource provides access to events resources.
 type EventsResource struct {
@@ -680,7 +697,7 @@ func (r *CustomersResource) ListCustomerPayments(ctx context.Context, email stri
 
 
 
-// ListCustomerSubscriptions 
+// ListCustomerSubscriptions
 func (r *CustomersResource) ListCustomerSubscriptions(ctx context.Context, email string) (*ListCustomerSubscriptionsResponse, error) {
 	path := fmt.Sprintf("/sdk/v1/customers/%s/subscriptions", email)
 	var result ListCustomerSubscriptionsResponse
@@ -698,6 +715,41 @@ func (r *CustomersResource) ListCustomerSubscriptions(ctx context.Context, email
 	return &result, nil
 }
 
+// UpdateCustomer updates a customer's profile information.
+func (r *CustomersResource) UpdateCustomer(ctx context.Context, id string, request *SDKUpdateCustomerRequest) (*SDKCustomerInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/customers/id/%s", id)
+	var result SDKCustomerInfo
+	err := r.client.request(
+		ctx,
+		"PUT",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// DeleteCustomer permanently deletes a customer (GDPR compliance).
+func (r *CustomersResource) DeleteCustomer(ctx context.Context, id string) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/customers/id/%s", id)
+	var result Response
+	err := r.client.request(
+		ctx,
+		"DELETE",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
 
 
 // SequencesResource provides access to sequences resources.
