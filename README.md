@@ -1,6 +1,6 @@
 # Levee SDK for Go
 
-Official Go SDK for integrating [Levee](https://levee.com) into your Go applications.
+Official Go SDK for integrating [Levee](https://levee.sh) into your Go applications.
 
 ## Table of Contents
 
@@ -73,7 +73,7 @@ func main() {
 ### Basic Configuration
 
 ```go
-// Default configuration - connects to https://levee.com
+// Default configuration - connects to https://levee.sh
 client, err := levee.NewClient("lv_your_api_key")
 if err != nil {
     log.Fatal(err)
@@ -253,14 +253,14 @@ client.RegisterHandlers(mux, "/levee")
 
 This registers the following endpoints on your server:
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /levee/e/o/:token` | Email open tracking (serves 1x1 transparent GIF) |
-| `GET /levee/e/c/:token` | Click tracking (redirects to destination URL) |
-| `GET /levee/e/u/:token` | One-click unsubscribe |
-| `GET /levee/confirm-email` | Double opt-in email confirmation |
-| `POST /levee/webhooks/stripe` | Stripe webhook receiver |
-| `POST /levee/webhooks/ses` | AWS SES bounce/complaint receiver |
+| Endpoint                      | Purpose                                          |
+| ----------------------------- | ------------------------------------------------ |
+| `GET /levee/e/o/:token`       | Email open tracking (serves 1x1 transparent GIF) |
+| `GET /levee/e/c/:token`       | Click tracking (redirects to destination URL)    |
+| `GET /levee/e/u/:token`       | One-click unsubscribe                            |
+| `GET /levee/confirm-email`    | Double opt-in email confirmation                 |
+| `POST /levee/webhooks/stripe` | Stripe webhook receiver                          |
+| `POST /levee/webhooks/ses`    | AWS SES bounce/complaint receiver                |
 
 ### Configuration Options
 
@@ -318,11 +318,11 @@ func main() {
 
 Your application must provide these pages for redirects:
 
-| Page | Purpose | Default Path |
-|------|---------|--------------|
-| Unsubscribe confirmation | Shown after user unsubscribes | `/unsubscribed` |
-| Email confirmed | Shown after double opt-in confirmation | `/confirmed` |
-| Link expired | Shown when confirmation token expires | `/confirm-expired` |
+| Page                     | Purpose                                | Default Path       |
+| ------------------------ | -------------------------------------- | ------------------ |
+| Unsubscribe confirmation | Shown after user unsubscribes          | `/unsubscribed`    |
+| Email confirmed          | Shown after double opt-in confirmation | `/confirmed`       |
+| Link expired             | Shown when confirmation token expires  | `/confirm-expired` |
 
 Override defaults with `WithUnsubscribeRedirect()`, `WithConfirmRedirect()`, and `WithConfirmExpiredRedirect()`.
 
@@ -369,7 +369,7 @@ The embedded handlers make Levee completely invisible to your end users:
                                     v (async forwarding)
                          +---------------------+
                          |  Levee API          |
-                         |  levee.com/sdk/v1/* |
+                         |  levee.sh/sdk/v1/* |
                          +---------------------+
 ```
 
@@ -407,7 +407,7 @@ log.Printf("Tokens: %d in, %d out, Cost: $%.4f", resp.InputTokens, resp.OutputTo
 
 ```go
 llm := levee.NewLLMClient("lv_your_api_key",
-    levee.WithGRPCAddress("llm.levee.com:9889"),
+    levee.WithGRPCAddress("llm.levee.sh:9889"),
 )
 defer llm.Close()
 
@@ -468,6 +468,7 @@ client.RegisterHandlers(mux, "/levee",
 The WebSocket chat uses JSON messages:
 
 **Client Messages:**
+
 ```json
 // Start session
 {"type": "start", "data": {"system_prompt": "...", "model": "sonnet", "max_tokens": 1024}}
@@ -480,6 +481,7 @@ The WebSocket chat uses JSON messages:
 ```
 
 **Server Messages:**
+
 ```json
 // Session started
 {"type": "started", "data": {"session_id": "...", "provider": "anthropic", "model": "claude-3-sonnet"}}
@@ -1428,120 +1430,120 @@ func main() {
 
 All methods use the resource-based pattern: `client.Resource.Method(ctx, ...)`
 
-| Resource.Method | Description |
-|-----------------|-------------|
-| **Client** | |
-| `NewClient(apiKey, opts...)` | Create a new client (returns `*Client, error`) |
-| `WithBaseURL(url)` | Set custom API base URL |
-| `WithHTTPClient(client)` | Set custom HTTP client |
-| `WithTimeout(duration)` | Set HTTP request timeout |
-| **Auth** | |
-| `Auth.Register(ctx, *SDKRegisterRequest)` | Register a new customer account |
-| `Auth.Login(ctx, *SDKLoginRequest)` | Authenticate and get tokens |
-| `Auth.RefreshToken(ctx, *SDKRefreshTokenRequest)` | Exchange refresh token for new tokens |
-| `Auth.ForgotPassword(ctx, *SDKForgotPasswordRequest)` | Initiate password reset |
-| `Auth.ResetPassword(ctx, *SDKResetPasswordRequest)` | Complete password reset |
-| `Auth.VerifyEmail(ctx, *SDKVerifyEmailRequest)` | Verify email address |
-| `Auth.ChangePassword(ctx, *SDKChangePasswordRequest)` | Change password while logged in |
-| **Billing** | |
-| `Billing.CreateCustomer(ctx, *CustomerRequest)` | Create billing customer |
-| `Billing.CreateCheckoutSession(ctx, *CheckoutRequest)` | Create Stripe checkout |
-| `Billing.CreateSubscription(ctx, *SubscriptionRequest)` | Create subscription |
-| `Billing.CancelSubscription(ctx, subscriptionID)` | Cancel subscription |
-| `Billing.RecordUsage(ctx, *UsageRequest)` | Record metered usage |
-| `Billing.GetCustomerPortal(ctx, *PortalRequest)` | Get portal URL |
-| **Contacts** | |
-| `Contacts.CreateContact(ctx, *ContactRequest)` | Create or get a contact |
-| `Contacts.GetContact(ctx, idOrEmail)` | Get contact details |
-| `Contacts.UpdateContact(ctx, id, *UpdateContactRequest)` | Update a contact |
-| `Contacts.AddContactTags(ctx, id, *AddContactTagsRequest)` | Add tags to contact |
-| `Contacts.RemoveContactTags(ctx, id, *RemoveContactTagsRequest)` | Remove tags from contact |
-| `Contacts.ListContactActivity(ctx, id, limit)` | Get contact activity |
-| `Contacts.GlobalUnsubscribe(ctx, *GlobalUnsubscribeRequest)` | Unsubscribe from all |
-| **Content** | |
-| `Content.ListContentPosts(ctx, page, pageSize, categorySlug)` | List published posts |
-| `Content.GetContentPost(ctx, slug)` | Get post by slug |
-| `Content.ListContentPages(ctx, page, pageSize)` | List published pages |
-| `Content.GetContentPage(ctx, slug)` | Get page by slug |
-| `Content.ListContentCategories(ctx)` | List content categories |
-| **Customers** | |
-| `Customers.GetCustomerByEmail(ctx, email)` | Get customer info |
-| `Customers.ListCustomerInvoices(ctx, email, limit)` | List invoices |
-| `Customers.ListCustomerOrders(ctx, email, limit)` | List orders |
-| `Customers.ListCustomerSubscriptions(ctx, email)` | List subscriptions |
-| `Customers.ListCustomerPayments(ctx, email, limit)` | List payments |
-| `Customers.UpdateCustomer(ctx, id, *SDKUpdateCustomerRequest)` | Update customer profile |
-| `Customers.DeleteCustomer(ctx, id)` | Delete customer (GDPR) |
-| **Emails** | |
-| `Emails.SendEmail(ctx, *SendEmailRequest)` | Send transactional email |
-| `Emails.GetEmailStatus(ctx, messageID)` | Get email delivery status |
-| `Emails.ListEmailEvents(ctx, messageID)` | Get email tracking events |
-| **Events** | |
-| `Events.TrackEvent(ctx, *EventRequest)` | Track custom event |
-| **Funnels** | |
-| `Funnels.GetFunnelStep(ctx, slug)` | Get funnel step info |
-| **Lists** | |
-| `Lists.SubscribeToList(ctx, slug, *SubscribeRequest)` | Subscribe to list |
-| `Lists.UnsubscribeFromList(ctx, slug, *SubscribeRequest)` | Unsubscribe from list |
-| **Llm** | |
-| `Llm.Chat(ctx, *LLMChatRequest)` | Simple chat via HTTP |
-| `Llm.Config(ctx)` | Get LLM configuration |
-| **Offers** | |
-| `Offers.ProcessOffer(ctx, *OfferRequest)` | Process an offer |
-| **Orders** | |
-| `Orders.CreateOrder(ctx, *OrderRequest)` | Create checkout session |
-| **Products** | |
-| `Products.GetProduct(ctx, slug)` | Get product by slug |
-| **Quizzes** | |
-| `Quizzes.GetQuiz(ctx, slug)` | Get quiz by slug |
-| `Quizzes.SubmitQuiz(ctx, slug, *QuizSubmitRequest)` | Submit quiz answers |
-| **Sequences** | |
-| `Sequences.EnrollInSequence(ctx, *EnrollSequenceRequest)` | Enroll in sequence |
-| `Sequences.GetSequenceEnrollments(ctx, email, sequenceSlug)` | Get enrollments |
-| `Sequences.UnenrollFromSequence(ctx, *UnenrollSequenceRequest)` | Unenroll from sequence |
-| `Sequences.PauseSequenceEnrollment(ctx, *PauseSequenceRequest)` | Pause enrollment |
-| `Sequences.ResumeSequenceEnrollment(ctx, *ResumeSequenceRequest)` | Resume enrollment |
-| **Site** | |
-| `Site.GetSiteSettings(ctx)` | Get site branding/settings |
-| `Site.ListNavigationMenus(ctx, location)` | List navigation menus |
-| `Site.GetNavigationMenu(ctx, slug)` | Get menu by slug |
-| `Site.ListAuthors(ctx)` | List all authors |
-| `Site.GetAuthor(ctx, id)` | Get author by ID |
-| **Stats** | |
-| `Stats.GetStatsOverview(ctx, startDate, endDate)` | Get overview stats |
-| `Stats.GetEmailStats(ctx, startDate, endDate, groupBy)` | Get email stats |
-| `Stats.GetRevenueStats(ctx, startDate, endDate, groupBy)` | Get revenue stats |
-| `Stats.GetContactStats(ctx, startDate, endDate, groupBy)` | Get contact stats |
-| **Tracking** | |
-| `Tracking.TrackOpen(ctx, *TrackOpenRequest)` | Track email open |
-| `Tracking.TrackClick(ctx, *TrackClickRequest)` | Track link click |
-| `Tracking.TrackUnsubscribe(ctx, *TrackUnsubscribeRequest)` | Track unsubscribe |
-| `Tracking.TrackConfirm(ctx, *TrackConfirmRequest)` | Track email confirmation |
-| **Webhooks** | |
-| `Webhooks.RegisterWebhook(ctx, *RegisterWebhookRequest)` | Register webhook |
-| `Webhooks.ListWebhooks(ctx)` | List webhooks |
-| `Webhooks.GetWebhook(ctx, webhookID)` | Get webhook details |
-| `Webhooks.UpdateWebhook(ctx, id, *UpdateWebhookRequest)` | Update webhook |
-| `Webhooks.DeleteWebhook(ctx, webhookID)` | Delete webhook |
-| `Webhooks.TestWebhook(ctx, webhookID)` | Send test event |
-| `Webhooks.ListWebhookLogs(ctx, webhookID, limit)` | Get delivery logs |
-| **Workshops** | |
-| `Workshops.GetWorkshop(ctx, slug)` | Get workshop by slug |
-| `Workshops.GetWorkshopByProduct(ctx, productSlug)` | Get workshop by product |
-| **Embedded Handlers** | |
-| `RegisterHandlers(mux, prefix, opts...)` | Register HTTP handlers on mux |
-| `WithUnsubscribeRedirect(url)` | Set unsubscribe redirect URL |
-| `WithConfirmRedirect(url)` | Set confirmation redirect URL |
-| `WithConfirmExpiredRedirect(url)` | Set expired token redirect URL |
-| `WithStripeWebhookSecret(secret)` | Set Stripe webhook secret |
-| `WithLLMClient(llm)` | Enable WebSocket chat handler |
-| `WithWSCheckOrigin(fn)` | Set WebSocket origin checker |
-| **LLM Client (gRPC)** | |
-| `NewLLMClient(apiKey, opts...)` | Create LLM client for streaming |
-| `WithGRPCAddress(addr)` | Set gRPC server address |
-| `Chat(ctx, ChatRequest)` | Simple chat (non-streaming) |
-| `NewChatSession(ctx, ChatRequest)` | Start streaming session |
-| `ChatStream(ctx, ChatRequest, callback)` | Convenience streaming method |
+| Resource.Method                                                   | Description                                    |
+| ----------------------------------------------------------------- | ---------------------------------------------- |
+| **Client**                                                        |                                                |
+| `NewClient(apiKey, opts...)`                                      | Create a new client (returns `*Client, error`) |
+| `WithBaseURL(url)`                                                | Set custom API base URL                        |
+| `WithHTTPClient(client)`                                          | Set custom HTTP client                         |
+| `WithTimeout(duration)`                                           | Set HTTP request timeout                       |
+| **Auth**                                                          |                                                |
+| `Auth.Register(ctx, *SDKRegisterRequest)`                         | Register a new customer account                |
+| `Auth.Login(ctx, *SDKLoginRequest)`                               | Authenticate and get tokens                    |
+| `Auth.RefreshToken(ctx, *SDKRefreshTokenRequest)`                 | Exchange refresh token for new tokens          |
+| `Auth.ForgotPassword(ctx, *SDKForgotPasswordRequest)`             | Initiate password reset                        |
+| `Auth.ResetPassword(ctx, *SDKResetPasswordRequest)`               | Complete password reset                        |
+| `Auth.VerifyEmail(ctx, *SDKVerifyEmailRequest)`                   | Verify email address                           |
+| `Auth.ChangePassword(ctx, *SDKChangePasswordRequest)`             | Change password while logged in                |
+| **Billing**                                                       |                                                |
+| `Billing.CreateCustomer(ctx, *CustomerRequest)`                   | Create billing customer                        |
+| `Billing.CreateCheckoutSession(ctx, *CheckoutRequest)`            | Create Stripe checkout                         |
+| `Billing.CreateSubscription(ctx, *SubscriptionRequest)`           | Create subscription                            |
+| `Billing.CancelSubscription(ctx, subscriptionID)`                 | Cancel subscription                            |
+| `Billing.RecordUsage(ctx, *UsageRequest)`                         | Record metered usage                           |
+| `Billing.GetCustomerPortal(ctx, *PortalRequest)`                  | Get portal URL                                 |
+| **Contacts**                                                      |                                                |
+| `Contacts.CreateContact(ctx, *ContactRequest)`                    | Create or get a contact                        |
+| `Contacts.GetContact(ctx, idOrEmail)`                             | Get contact details                            |
+| `Contacts.UpdateContact(ctx, id, *UpdateContactRequest)`          | Update a contact                               |
+| `Contacts.AddContactTags(ctx, id, *AddContactTagsRequest)`        | Add tags to contact                            |
+| `Contacts.RemoveContactTags(ctx, id, *RemoveContactTagsRequest)`  | Remove tags from contact                       |
+| `Contacts.ListContactActivity(ctx, id, limit)`                    | Get contact activity                           |
+| `Contacts.GlobalUnsubscribe(ctx, *GlobalUnsubscribeRequest)`      | Unsubscribe from all                           |
+| **Content**                                                       |                                                |
+| `Content.ListContentPosts(ctx, page, pageSize, categorySlug)`     | List published posts                           |
+| `Content.GetContentPost(ctx, slug)`                               | Get post by slug                               |
+| `Content.ListContentPages(ctx, page, pageSize)`                   | List published pages                           |
+| `Content.GetContentPage(ctx, slug)`                               | Get page by slug                               |
+| `Content.ListContentCategories(ctx)`                              | List content categories                        |
+| **Customers**                                                     |                                                |
+| `Customers.GetCustomerByEmail(ctx, email)`                        | Get customer info                              |
+| `Customers.ListCustomerInvoices(ctx, email, limit)`               | List invoices                                  |
+| `Customers.ListCustomerOrders(ctx, email, limit)`                 | List orders                                    |
+| `Customers.ListCustomerSubscriptions(ctx, email)`                 | List subscriptions                             |
+| `Customers.ListCustomerPayments(ctx, email, limit)`               | List payments                                  |
+| `Customers.UpdateCustomer(ctx, id, *SDKUpdateCustomerRequest)`    | Update customer profile                        |
+| `Customers.DeleteCustomer(ctx, id)`                               | Delete customer (GDPR)                         |
+| **Emails**                                                        |                                                |
+| `Emails.SendEmail(ctx, *SendEmailRequest)`                        | Send transactional email                       |
+| `Emails.GetEmailStatus(ctx, messageID)`                           | Get email delivery status                      |
+| `Emails.ListEmailEvents(ctx, messageID)`                          | Get email tracking events                      |
+| **Events**                                                        |                                                |
+| `Events.TrackEvent(ctx, *EventRequest)`                           | Track custom event                             |
+| **Funnels**                                                       |                                                |
+| `Funnels.GetFunnelStep(ctx, slug)`                                | Get funnel step info                           |
+| **Lists**                                                         |                                                |
+| `Lists.SubscribeToList(ctx, slug, *SubscribeRequest)`             | Subscribe to list                              |
+| `Lists.UnsubscribeFromList(ctx, slug, *SubscribeRequest)`         | Unsubscribe from list                          |
+| **Llm**                                                           |                                                |
+| `Llm.Chat(ctx, *LLMChatRequest)`                                  | Simple chat via HTTP                           |
+| `Llm.Config(ctx)`                                                 | Get LLM configuration                          |
+| **Offers**                                                        |                                                |
+| `Offers.ProcessOffer(ctx, *OfferRequest)`                         | Process an offer                               |
+| **Orders**                                                        |                                                |
+| `Orders.CreateOrder(ctx, *OrderRequest)`                          | Create checkout session                        |
+| **Products**                                                      |                                                |
+| `Products.GetProduct(ctx, slug)`                                  | Get product by slug                            |
+| **Quizzes**                                                       |                                                |
+| `Quizzes.GetQuiz(ctx, slug)`                                      | Get quiz by slug                               |
+| `Quizzes.SubmitQuiz(ctx, slug, *QuizSubmitRequest)`               | Submit quiz answers                            |
+| **Sequences**                                                     |                                                |
+| `Sequences.EnrollInSequence(ctx, *EnrollSequenceRequest)`         | Enroll in sequence                             |
+| `Sequences.GetSequenceEnrollments(ctx, email, sequenceSlug)`      | Get enrollments                                |
+| `Sequences.UnenrollFromSequence(ctx, *UnenrollSequenceRequest)`   | Unenroll from sequence                         |
+| `Sequences.PauseSequenceEnrollment(ctx, *PauseSequenceRequest)`   | Pause enrollment                               |
+| `Sequences.ResumeSequenceEnrollment(ctx, *ResumeSequenceRequest)` | Resume enrollment                              |
+| **Site**                                                          |                                                |
+| `Site.GetSiteSettings(ctx)`                                       | Get site branding/settings                     |
+| `Site.ListNavigationMenus(ctx, location)`                         | List navigation menus                          |
+| `Site.GetNavigationMenu(ctx, slug)`                               | Get menu by slug                               |
+| `Site.ListAuthors(ctx)`                                           | List all authors                               |
+| `Site.GetAuthor(ctx, id)`                                         | Get author by ID                               |
+| **Stats**                                                         |                                                |
+| `Stats.GetStatsOverview(ctx, startDate, endDate)`                 | Get overview stats                             |
+| `Stats.GetEmailStats(ctx, startDate, endDate, groupBy)`           | Get email stats                                |
+| `Stats.GetRevenueStats(ctx, startDate, endDate, groupBy)`         | Get revenue stats                              |
+| `Stats.GetContactStats(ctx, startDate, endDate, groupBy)`         | Get contact stats                              |
+| **Tracking**                                                      |                                                |
+| `Tracking.TrackOpen(ctx, *TrackOpenRequest)`                      | Track email open                               |
+| `Tracking.TrackClick(ctx, *TrackClickRequest)`                    | Track link click                               |
+| `Tracking.TrackUnsubscribe(ctx, *TrackUnsubscribeRequest)`        | Track unsubscribe                              |
+| `Tracking.TrackConfirm(ctx, *TrackConfirmRequest)`                | Track email confirmation                       |
+| **Webhooks**                                                      |                                                |
+| `Webhooks.RegisterWebhook(ctx, *RegisterWebhookRequest)`          | Register webhook                               |
+| `Webhooks.ListWebhooks(ctx)`                                      | List webhooks                                  |
+| `Webhooks.GetWebhook(ctx, webhookID)`                             | Get webhook details                            |
+| `Webhooks.UpdateWebhook(ctx, id, *UpdateWebhookRequest)`          | Update webhook                                 |
+| `Webhooks.DeleteWebhook(ctx, webhookID)`                          | Delete webhook                                 |
+| `Webhooks.TestWebhook(ctx, webhookID)`                            | Send test event                                |
+| `Webhooks.ListWebhookLogs(ctx, webhookID, limit)`                 | Get delivery logs                              |
+| **Workshops**                                                     |                                                |
+| `Workshops.GetWorkshop(ctx, slug)`                                | Get workshop by slug                           |
+| `Workshops.GetWorkshopByProduct(ctx, productSlug)`                | Get workshop by product                        |
+| **Embedded Handlers**                                             |                                                |
+| `RegisterHandlers(mux, prefix, opts...)`                          | Register HTTP handlers on mux                  |
+| `WithUnsubscribeRedirect(url)`                                    | Set unsubscribe redirect URL                   |
+| `WithConfirmRedirect(url)`                                        | Set confirmation redirect URL                  |
+| `WithConfirmExpiredRedirect(url)`                                 | Set expired token redirect URL                 |
+| `WithStripeWebhookSecret(secret)`                                 | Set Stripe webhook secret                      |
+| `WithLLMClient(llm)`                                              | Enable WebSocket chat handler                  |
+| `WithWSCheckOrigin(fn)`                                           | Set WebSocket origin checker                   |
+| **LLM Client (gRPC)**                                             |                                                |
+| `NewLLMClient(apiKey, opts...)`                                   | Create LLM client for streaming                |
+| `WithGRPCAddress(addr)`                                           | Set gRPC server address                        |
+| `Chat(ctx, ChatRequest)`                                          | Simple chat (non-streaming)                    |
+| `NewChatSession(ctx, ChatRequest)`                                | Start streaming session                        |
+| `ChatStream(ctx, ChatRequest, callback)`                          | Convenience streaming method                   |
 
 ---
 

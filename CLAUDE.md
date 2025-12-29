@@ -8,7 +8,7 @@ Levee SDK for Go - Official SDK for integrating the Levee API (email marketing a
 
 - **Module**: `github.com/almatuck/levee-go`
 - **Go Version**: 1.21+
-- **API Base URL**: `https://levee.com/sdk/v1` (customizable)
+- **API Base URL**: `https://levee.sh/sdk/v1` (customizable)
 
 ## Commands
 
@@ -29,26 +29,26 @@ No Makefile or build scripts - pure Go library consumed by parent projects.
 
 Single-package library with Go files organized by domain:
 
-| File | Purpose |
-|------|---------|
-| `client.go` | Core client, HTTP handling, functional options pattern |
-| `handlers.go` | Embeddable HTTP handlers for white-label webhooks/tracking |
-| `ws.go` | WebSocket handler for LLM chat streaming (gRPC-to-WebSocket bridge) |
-| `llm.go` | LLM/AI chat client with gRPC streaming support |
-| `llm.proto` | Protocol buffer definitions for LLM service |
-| `llmpb/` | Generated protobuf Go code |
-| `content.go` | CMS read-only endpoints (posts, pages, categories) |
-| `site.go` | Site configuration (settings, menus, authors) |
-| `contacts.go` | Contact CRUD, tags, activity, unsubscribe |
-| `emails.go` | Transactional emails, delivery status/events |
-| `sequences.go` | Drip campaign enrollment management |
-| `billing.go` | Stripe customers, checkouts, subscriptions, metered usage |
-| `customers.go` | Read-only customer billing history |
-| `webhooks.go` | Webhook registration, testing, delivery logs |
-| `tracking.go` | Custom event tracking |
-| `stats.go` | Analytics (email, revenue, contact stats) |
-| `lists.go` | Email list subscriptions |
-| `orders.go` | Order creation with checkout URLs |
+| File           | Purpose                                                             |
+| -------------- | ------------------------------------------------------------------- |
+| `client.go`    | Core client, HTTP handling, functional options pattern              |
+| `handlers.go`  | Embeddable HTTP handlers for white-label webhooks/tracking          |
+| `ws.go`        | WebSocket handler for LLM chat streaming (gRPC-to-WebSocket bridge) |
+| `llm.go`       | LLM/AI chat client with gRPC streaming support                      |
+| `llm.proto`    | Protocol buffer definitions for LLM service                         |
+| `llmpb/`       | Generated protobuf Go code                                          |
+| `content.go`   | CMS read-only endpoints (posts, pages, categories)                  |
+| `site.go`      | Site configuration (settings, menus, authors)                       |
+| `contacts.go`  | Contact CRUD, tags, activity, unsubscribe                           |
+| `emails.go`    | Transactional emails, delivery status/events                        |
+| `sequences.go` | Drip campaign enrollment management                                 |
+| `billing.go`   | Stripe customers, checkouts, subscriptions, metered usage           |
+| `customers.go` | Read-only customer billing history                                  |
+| `webhooks.go`  | Webhook registration, testing, delivery logs                        |
+| `tracking.go`  | Custom event tracking                                               |
+| `stats.go`     | Analytics (email, revenue, contact stats)                           |
+| `lists.go`     | Email list subscriptions                                            |
+| `orders.go`    | Order creation with checkout URLs                                   |
 
 ## Embedded HTTP Handlers
 
@@ -81,7 +81,7 @@ Handlers forward events to Levee API asynchronously (tracking) or synchronously 
 The SDK includes a gRPC client for LLM chat with streaming support:
 
 ```go
-llm := levee.NewLLMClient(apiKey, levee.WithGRPCAddress("llm.levee.com:9889"))
+llm := levee.NewLLMClient(apiKey, levee.WithGRPCAddress("llm.levee.sh:9889"))
 defer llm.Close()
 
 // Streaming chat
@@ -97,11 +97,13 @@ The WebSocket handler (`ws.go`) bridges browser WebSocket connections to gRPC st
 ## Key Patterns
 
 **Functional Options** for configuration:
+
 ```go
 client := levee.New(apiKey, levee.WithBaseURL(url), levee.WithHTTPClient(httpClient))
 ```
 
 **Context-first API** - all methods accept `context.Context` as first parameter:
+
 ```go
 func (c *Client) CreateContact(ctx context.Context, contact Contact) (*ContactResponse, error)
 ```

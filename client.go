@@ -14,17 +14,8 @@ import (
 	"time"
 )
 
-const defaultBaseURL = "https://levee.com"
-
 // ClientOption is a function that configures the Client.
 type ClientOption func(*Client)
-
-// WithBaseURL sets the base URL for the API client.
-func WithBaseURL(baseURL string) ClientOption {
-	return func(c *Client) {
-		c.baseURL = strings.TrimSuffix(baseURL, "/")
-	}
-}
 
 // WithHTTPClient sets a custom HTTP client.
 func WithHTTPClient(httpClient *http.Client) ClientOption {
@@ -47,57 +38,61 @@ type Client struct {
 	httpClient *http.Client
 
 
-	// Funnels provides access to funnels resources.
-	Funnels *FunnelsResource
-	// Offers provides access to offers resources.
-	Offers *OffersResource
-	// Orders provides access to orders resources.
-	Orders *OrdersResource
-	// Billing provides access to billing resources.
-	Billing *BillingResource
-	// Stats provides access to stats resources.
-	Stats *StatsResource
+	// Webhooks provides access to webhooks resources.
+	Webhooks *WebhooksResource
+	// Lists provides access to lists resources.
+	Lists *ListsResource
 	// Quizzes provides access to quizzes resources.
 	Quizzes *QuizzesResource
-	// Workshops provides access to workshops resources.
-	Workshops *WorkshopsResource
-	// Customers provides access to customers resources.
-	Customers *CustomersResource
 	// Llm provides access to llm resources.
 	Llm *LlmResource
 	// Sequences provides access to sequences resources.
 	Sequences *SequencesResource
-	// Tracking provides access to tracking resources.
-	Tracking *TrackingResource
-	// Contacts provides access to contacts resources.
-	Contacts *ContactsResource
-	// Events provides access to events resources.
-	Events *EventsResource
-	// Lists provides access to lists resources.
-	Lists *ListsResource
-	// Auth provides access to auth resources.
-	Auth *AuthResource
+	// Offers provides access to offers resources.
+	Offers *OffersResource
 	// Site provides access to site resources.
 	Site *SiteResource
-	// Webhooks provides access to webhooks resources.
-	Webhooks *WebhooksResource
+	// Events provides access to events resources.
+	Events *EventsResource
+	// Orders provides access to orders resources.
+	Orders *OrdersResource
 	// Products provides access to products resources.
 	Products *ProductsResource
-	// Emails provides access to emails resources.
-	Emails *EmailsResource
+	// Workshops provides access to workshops resources.
+	Workshops *WorkshopsResource
+	// Auth provides access to auth resources.
+	Auth *AuthResource
+	// Billing provides access to billing resources.
+	Billing *BillingResource
 	// Content provides access to content resources.
 	Content *ContentResource
+	// Customers provides access to customers resources.
+	Customers *CustomersResource
+	// Contacts provides access to contacts resources.
+	Contacts *ContactsResource
+	// Funnels provides access to funnels resources.
+	Funnels *FunnelsResource
+	// Emails provides access to emails resources.
+	Emails *EmailsResource
+	// Stats provides access to stats resources.
+	Stats *StatsResource
+	// Tracking provides access to tracking resources.
+	Tracking *TrackingResource
 }
 
 // NewClient creates a new Levee API client.
-func NewClient(apiKey string, opts ...ClientOption) (*Client, error) {
+// baseURL is required - this is a self-hosted system, use your Levee instance URL.
+func NewClient(apiKey string, baseURL string, opts ...ClientOption) (*Client, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("api key is required")
+	}
+	if baseURL == "" {
+		return nil, fmt.Errorf("base URL is required")
 	}
 
 	c := &Client{
 		apiKey:  apiKey,
-		baseURL: defaultBaseURL,
+		baseURL: strings.TrimSuffix(baseURL, "/"),
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -108,26 +103,26 @@ func NewClient(apiKey string, opts ...ClientOption) (*Client, error) {
 	}
 
 
-	c.Funnels = &FunnelsResource{client: c}
-	c.Offers = &OffersResource{client: c}
-	c.Orders = &OrdersResource{client: c}
-	c.Billing = &BillingResource{client: c}
-	c.Stats = &StatsResource{client: c}
+	c.Webhooks = &WebhooksResource{client: c}
+	c.Lists = &ListsResource{client: c}
 	c.Quizzes = &QuizzesResource{client: c}
-	c.Workshops = &WorkshopsResource{client: c}
-	c.Customers = &CustomersResource{client: c}
 	c.Llm = &LlmResource{client: c}
 	c.Sequences = &SequencesResource{client: c}
-	c.Tracking = &TrackingResource{client: c}
-	c.Contacts = &ContactsResource{client: c}
-	c.Events = &EventsResource{client: c}
-	c.Lists = &ListsResource{client: c}
-	c.Auth = &AuthResource{client: c}
+	c.Offers = &OffersResource{client: c}
 	c.Site = &SiteResource{client: c}
-	c.Webhooks = &WebhooksResource{client: c}
+	c.Events = &EventsResource{client: c}
+	c.Orders = &OrdersResource{client: c}
 	c.Products = &ProductsResource{client: c}
-	c.Emails = &EmailsResource{client: c}
+	c.Workshops = &WorkshopsResource{client: c}
+	c.Auth = &AuthResource{client: c}
+	c.Billing = &BillingResource{client: c}
 	c.Content = &ContentResource{client: c}
+	c.Customers = &CustomersResource{client: c}
+	c.Contacts = &ContactsResource{client: c}
+	c.Funnels = &FunnelsResource{client: c}
+	c.Emails = &EmailsResource{client: c}
+	c.Stats = &StatsResource{client: c}
+	c.Tracking = &TrackingResource{client: c}
 
 	return c, nil
 }
