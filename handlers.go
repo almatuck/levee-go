@@ -598,7 +598,7 @@ func verifyStripeSignature(payload []byte, signature, secret string) bool {
 
 // RecordOpen records an email open event.
 func (c *Client) RecordOpen(ctx context.Context, token string) error {
-	resp, err := c.doRequest(ctx, http.MethodPost, "/tracking/open", map[string]string{
+	resp, err := c.doRequest(ctx, http.MethodPost, "/sdk/v1/tracking/open", map[string]string{
 		"token": token,
 	})
 	if err != nil {
@@ -609,7 +609,7 @@ func (c *Client) RecordOpen(ctx context.Context, token string) error {
 
 // RecordClick records an email click event.
 func (c *Client) RecordClick(ctx context.Context, token, url string) error {
-	resp, err := c.doRequest(ctx, http.MethodPost, "/tracking/click", map[string]string{
+	resp, err := c.doRequest(ctx, http.MethodPost, "/sdk/v1/tracking/click", map[string]string{
 		"token": token,
 		"url":   url,
 	})
@@ -621,7 +621,7 @@ func (c *Client) RecordClick(ctx context.Context, token, url string) error {
 
 // RecordUnsubscribe records an unsubscribe event.
 func (c *Client) RecordUnsubscribe(ctx context.Context, token string) error {
-	resp, err := c.doRequest(ctx, http.MethodPost, "/tracking/unsubscribe", map[string]string{
+	resp, err := c.doRequest(ctx, http.MethodPost, "/sdk/v1/tracking/unsubscribe", map[string]string{
 		"token": token,
 	})
 	if err != nil {
@@ -639,7 +639,7 @@ type ConfirmEmailResponse struct {
 
 // ConfirmEmail confirms an email subscription (double opt-in).
 func (c *Client) ConfirmEmail(ctx context.Context, token string) (*ConfirmEmailResponse, error) {
-	resp, err := c.doRequest(ctx, http.MethodPost, "/tracking/confirm", map[string]string{
+	resp, err := c.doRequest(ctx, http.MethodPost, "/sdk/v1/tracking/confirm", map[string]string{
 		"token": token,
 	})
 	if err != nil {
