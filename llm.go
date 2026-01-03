@@ -2,19 +2,28 @@ package levee
 
 import (
 	"context"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
+	"strings"
 	"sync"
 
 	"github.com/almatuck/levee-go/llmpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 // LLMClient provides access to the Levee LLM gateway.
 type LLMClient struct {
 	apiKey     string
-	grpcAddr   string
+	baseURL    string // Base URL for HTTP API (e.g., "https://levee.example.com")
+	grpcAddr   string // gRPC address override (host:port), if empty uses auto-discovery
+	useTLS     bool   // Determined from baseURL scheme (https = true)
+	httpClient *http.Client
 	conn       *grpc.ClientConn
 	client     llmpb.LLMServiceClient
 	mu         sync.Mutex
@@ -23,18 +32,36 @@ type LLMClient struct {
 // LLMOption is a functional option for configuring the LLM client.
 type LLMOption func(*LLMClient)
 
-// WithGRPCAddress sets the gRPC server address.
+// WithGRPCAddress sets the gRPC server address explicitly (host:port).
+// If not set, the address will be auto-discovered from the config endpoint.
 func WithGRPCAddress(addr string) LLMOption {
 	return func(c *LLMClient) {
 		c.grpcAddr = addr
 	}
 }
 
+// WithLLMHTTPClient sets a custom HTTP client for config API calls.
+func WithLLMHTTPClient(client *http.Client) LLMOption {
+	return func(c *LLMClient) {
+		c.httpClient = client
+	}
+}
+
 // NewLLMClient creates a new LLM client.
-func NewLLMClient(apiKey string, opts ...LLMOption) *LLMClient {
+//
+// baseURL is the Levee API URL (e.g., "https://levee.example.com").
+// TLS is automatically determined from the URL scheme:
+//   - https:// → TLS enabled
+//   - http:// → plaintext (development only)
+//
+// The gRPC port is auto-discovered from /sdk/v1/llm/config unless
+// explicitly set with WithGRPCAddress.
+func NewLLMClient(apiKey string, baseURL string, opts ...LLMOption) *LLMClient {
 	c := &LLMClient{
-		apiKey:   apiKey,
-		grpcAddr: "localhost:9889", // Default gRPC address
+		apiKey:     apiKey,
+		baseURL:    strings.TrimSuffix(baseURL, "/"),
+		useTLS:     strings.HasPrefix(baseURL, "https://"),
+		httpClient: http.DefaultClient,
 	}
 
 	for _, opt := range opts {
@@ -42,6 +69,47 @@ func NewLLMClient(apiKey string, opts ...LLMOption) *LLMClient {
 	}
 
 	return c
+}
+
+// llmConfigResponse represents the response from /sdk/v1/llm/config
+type llmConfigResponse struct {
+	Available           bool     `json:"available"`
+	GRPCPort            int      `json:"grpc_port"`
+	DefaultProvider     string   `json:"default_provider"`
+	ConfiguredProviders []string `json:"configured_providers"`
+}
+
+// fetchConfig fetches the LLM configuration from the API.
+func (c *LLMClient) fetchConfig(ctx context.Context) (*llmConfigResponse, error) {
+	if c.baseURL == "" {
+		return nil, fmt.Errorf("baseURL is required for auto-discovery")
+	}
+
+	reqURL := c.baseURL + "/sdk/v1/llm/config"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create config request: %w", err)
+	}
+
+	req.Header.Set("X-API-Key", c.apiKey)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch LLM config: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("config request failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var config llmConfigResponse
+	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+		return nil, fmt.Errorf("failed to decode config response: %w", err)
+	}
+
+	return &config, nil
 }
 
 // connect establishes the gRPC connection if not already connected.
@@ -53,9 +121,40 @@ func (c *LLMClient) connect() error {
 		return nil
 	}
 
-	conn, err := grpc.NewClient(c.grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// Determine gRPC address
+	grpcAddr := c.grpcAddr
+	if grpcAddr == "" {
+		// Auto-discover from config endpoint
+		config, err := c.fetchConfig(context.Background())
+		if err != nil {
+			return fmt.Errorf("failed to auto-discover gRPC address: %w", err)
+		}
+
+		if !config.Available {
+			return fmt.Errorf("LLM service is not available for this organization")
+		}
+
+		// Extract host from baseURL
+		parsedURL, err := url.Parse(c.baseURL)
+		if err != nil {
+			return fmt.Errorf("failed to parse baseURL: %w", err)
+		}
+
+		grpcAddr = fmt.Sprintf("%s:%d", parsedURL.Hostname(), config.GRPCPort)
+		c.grpcAddr = grpcAddr // Cache for future connections
+	}
+
+	// Create gRPC connection with appropriate credentials (TLS determined from baseURL scheme)
+	var opts []grpc.DialOption
+	if c.useTLS {
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
+
+	conn, err := grpc.NewClient(grpcAddr, opts...)
 	if err != nil {
-		return fmt.Errorf("failed to connect to LLM server: %w", err)
+		return fmt.Errorf("failed to connect to LLM server at %s: %w", grpcAddr, err)
 	}
 
 	c.conn = conn
@@ -87,7 +186,7 @@ type ChatMessage struct {
 type ChatRequest struct {
 	Messages     []ChatMessage
 	SystemPrompt string
-	Model        string  // "haiku", "sonnet", "opus"
+	Model        string // "haiku", "sonnet", "opus" or full model ID
 	MaxTokens    int32
 	Temperature  float32
 }
@@ -152,10 +251,10 @@ type StreamCallback func(chunk StreamChunk) error
 
 // ChatSession represents an active chat session for bidirectional streaming.
 type ChatSession struct {
-	stream   llmpb.LLMService_ChatClient
-	apiKey   string
-	done     bool
-	mu       sync.Mutex
+	stream llmpb.LLMService_ChatClient
+	apiKey string
+	done   bool
+	mu     sync.Mutex
 }
 
 // NewChatSession starts a new bidirectional chat session.
