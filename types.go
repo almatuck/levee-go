@@ -120,15 +120,18 @@ type CheckoutRequest struct {
 	CustomerEmail string `json:"customer_email"`
 	LineItems []CheckoutItem `json:"line_items"`
 	Mode string `json:"mode"`
-	SuccessUrl string `json:"success_url"`
-	CancelUrl string `json:"cancel_url"`
+	SuccessUrl string `json:"success_url,omitempty"`
+	CancelUrl string `json:"cancel_url,omitempty"`
+	Embedded bool `json:"embedded,omitempty"`
+	ReturnUrl string `json:"return_url,omitempty"`
 }
 
 
 // CheckoutResponse represents the CheckoutResponse type.
 type CheckoutResponse struct {
 	SessionID string `json:"session_id"`
-	CheckoutUrl string `json:"checkout_url"`
+	CheckoutUrl string `json:"checkout_url,omitempty"`
+	ClientSecret string `json:"client_secret,omitempty"`
 }
 
 
