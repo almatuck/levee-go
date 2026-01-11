@@ -120,7 +120,7 @@ type CheckoutRequest struct {
 	CustomerEmail string `json:"customer_email"`
 	LineItems []CheckoutItem `json:"line_items"`
 	Mode string `json:"mode"`
-	SuccessUrl string `json:"success_url,omitempty"`
+	SuccessUrl string `json:"success_url"`
 	CancelUrl string `json:"cancel_url,omitempty"`
 	Embedded bool `json:"embedded,omitempty"`
 	ReturnUrl string `json:"return_url,omitempty"`
@@ -904,6 +904,7 @@ type SDKCustomerInfo struct {
 // SDKForgotPasswordRequest represents the SDKForgotPasswordRequest type.
 type SDKForgotPasswordRequest struct {
 	Email string `json:"email"`
+	ResetPath string `json:"reset_path,omitempty"`
 }
 
 

@@ -1112,6 +1112,48 @@ checkout, err := client.Billing.CreateCheckoutSession(ctx, &levee.CheckoutReques
 // Redirect to checkout.CheckoutUrl
 ```
 
+### Embedded Checkout
+
+Embed Stripe checkout directly on your site instead of redirecting to Stripe's hosted page:
+
+```go
+checkout, err := client.Billing.CreateCheckoutSession(ctx, &levee.CheckoutRequest{
+    CustomerEmail: "user@example.com",
+    LineItems: []levee.CheckoutItem{
+        {PriceID: "price_xxx", Quantity: 1},
+    },
+    Mode:       "payment",
+    SuccessUrl: "https://yourapp.com/success",
+    Embedded:   true,
+    ReturnUrl:  "https://yourapp.com/checkout/complete?session_id={CHECKOUT_SESSION_ID}",
+})
+
+// Use checkout.ClientSecret with Stripe.js to mount embedded checkout
+log.Printf("Client Secret: %s", checkout.ClientSecret)
+```
+
+**Frontend integration** (JavaScript/TypeScript):
+
+```typescript
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
+
+// Use the client_secret from your backend
+const checkout = await stripe.initEmbeddedCheckout({
+    clientSecret: clientSecretFromBackend,
+});
+
+// Mount to a DOM element
+checkout.mount('#checkout-container');
+```
+
+**Benefits of embedded checkout:**
+- Users stay on your site during payment
+- More control over the checkout appearance
+- Enable custom upsell flows before/after payment
+- Maintain your site branding throughout
+
 ### Create a Subscription
 
 ```go
