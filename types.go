@@ -840,6 +840,8 @@ type SDKAuthCustomerInfo struct {
 	Name string `json:"name,omitempty"`
 	EmailVerified bool `json:"email_verified"`
 	CreatedAt string `json:"created_at"`
+	Role string `json:"role,omitempty"`
+	OrgID string `json:"org_id,omitempty"`
 }
 
 
