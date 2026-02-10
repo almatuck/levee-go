@@ -758,9 +758,20 @@ type OrgMember struct {
 }
 
 
+// PendingInvite represents the PendingInvite type.
+type PendingInvite struct {
+	Email string `json:"email"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+	InvitedAt string `json:"invited_at"`
+	ExpiresAt string `json:"expires_at"`
+}
+
+
 // OrgMembersResponse represents the OrgMembersResponse type.
 type OrgMembersResponse struct {
 	Members []OrgMember `json:"members"`
+	PendingInvites []PendingInvite `json:"pending_invites"`
 	Total int `json:"total"`
 }
 

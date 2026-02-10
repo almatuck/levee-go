@@ -11,17 +11,249 @@ import (
 )
 
 
-// ProductsResource provides access to products resources.
-type ProductsResource struct {
+// ListsResource provides access to lists resources.
+type ListsResource struct {
 	client *Client
 }
 
 
 
-// GetProduct 
-func (r *ProductsResource) GetProduct(ctx context.Context, slug string) (*BillingProductInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/products/%s", slug)
-	var result BillingProductInfo
+// SubscribeToList 
+func (r *ListsResource) SubscribeToList(ctx context.Context, slug string, request *SubscribeRequest) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/lists/%s/subscribe", slug)
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// UnsubscribeFromList 
+func (r *ListsResource) UnsubscribeFromList(ctx context.Context, slug string, request *SubscribeRequest) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/lists/%s/unsubscribe", slug)
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// OrdersResource provides access to orders resources.
+type OrdersResource struct {
+	client *Client
+}
+
+
+
+// CreateOrder 
+func (r *OrdersResource) CreateOrder(ctx context.Context, request *OrderRequest) (*OrderResponse, error) {
+	var result OrderResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/orders",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// AuthResource provides access to auth resources.
+type AuthResource struct {
+	client *Client
+}
+
+
+
+// ChangePassword 
+func (r *AuthResource) ChangePassword(ctx context.Context, request *SDKChangePasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/change-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ForgotPassword 
+func (r *AuthResource) ForgotPassword(ctx context.Context, request *SDKForgotPasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/forgot-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// Login 
+func (r *AuthResource) Login(ctx context.Context, request *SDKLoginRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/login",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// RefreshToken 
+func (r *AuthResource) RefreshToken(ctx context.Context, request *SDKRefreshTokenRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/refresh",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// Register 
+func (r *AuthResource) Register(ctx context.Context, request *SDKRegisterRequest) (*SDKAuthResponse, error) {
+	var result SDKAuthResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/register",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ResetPassword 
+func (r *AuthResource) ResetPassword(ctx context.Context, request *SDKResetPasswordRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/reset-password",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// VerifyEmail 
+func (r *AuthResource) VerifyEmail(ctx context.Context, request *SDKVerifyEmailRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/auth/verify-email",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// EmailsResource provides access to emails resources.
+type EmailsResource struct {
+	client *Client
+}
+
+
+
+// SendEmail 
+func (r *EmailsResource) SendEmail(ctx context.Context, request *SendEmailRequest) (*SendEmailResponse, error) {
+	var result SendEmailResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/emails/",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GetEmailStatus 
+func (r *EmailsResource) GetEmailStatus(ctx context.Context, messageId string) (*EmailStatusResponse, error) {
+	path := fmt.Sprintf("/sdk/v1/emails/%s", messageId)
+	var result EmailStatusResponse
 	err := r.client.request(
 		ctx,
 		"GET",
@@ -38,165 +270,16 @@ func (r *ProductsResource) GetProduct(ctx context.Context, slug string) (*Billin
 
 
 
-// QuizzesResource provides access to quizzes resources.
-type QuizzesResource struct {
-	client *Client
-}
-
-
-
-// GetQuiz 
-func (r *QuizzesResource) GetQuiz(ctx context.Context, slug string) (*QuizInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/quizzes/%s", slug)
-	var result QuizInfo
+// ListEmailEvents 
+func (r *EmailsResource) ListEmailEvents(ctx context.Context, messageId string) (*ListEmailEventsResponse, error) {
+	path := fmt.Sprintf("/sdk/v1/emails/%s/events", messageId)
+	var result ListEmailEventsResponse
 	err := r.client.request(
 		ctx,
 		"GET",
 		path,
 		nil,
 		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// SubmitQuiz 
-func (r *QuizzesResource) SubmitQuiz(ctx context.Context, slug string, request *QuizSubmitRequest) (*QuizSubmitResponse, error) {
-	path := fmt.Sprintf("/sdk/v1/quizzes/%s/submit", slug)
-	var result QuizSubmitResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// BillingResource provides access to billing resources.
-type BillingResource struct {
-	client *Client
-}
-
-
-
-// CreateCheckoutSession 
-func (r *BillingResource) CreateCheckoutSession(ctx context.Context, request *CheckoutRequest) (*CheckoutResponse, error) {
-	var result CheckoutResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/billing/checkout",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// CreateCustomer 
-func (r *BillingResource) CreateCustomer(ctx context.Context, request *CustomerRequest) (*CustomerResponse, error) {
-	var result CustomerResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/billing/customers",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GetCustomerPortal 
-func (r *BillingResource) GetCustomerPortal(ctx context.Context, request *PortalRequest) (*PortalResponse, error) {
-	var result PortalResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/billing/portal",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// CreateSubscription 
-func (r *BillingResource) CreateSubscription(ctx context.Context, request *SubscriptionRequest) (*SubscriptionResponse, error) {
-	var result SubscriptionResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/billing/subscriptions",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// CancelSubscription 
-func (r *BillingResource) CancelSubscription(ctx context.Context, id string) (*Response, error) {
-	path := fmt.Sprintf("/sdk/v1/billing/subscriptions/%s/cancel", id)
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// RecordUsage 
-func (r *BillingResource) RecordUsage(ctx context.Context, request *UsageRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/billing/usage",
-		nil,
-		request,
 		&result,
 	)
 	if err != nil {
@@ -316,172 +399,6 @@ func (r *StatsResource) GetRevenueStats(ctx context.Context, startDate string, e
 		"GET",
 		"/sdk/v1/stats/revenue",
 		query,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// FunnelsResource provides access to funnels resources.
-type FunnelsResource struct {
-	client *Client
-}
-
-
-
-// GetFunnelStep 
-func (r *FunnelsResource) GetFunnelStep(ctx context.Context, slug string) (*FunnelStepInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/funnels/%s", slug)
-	var result FunnelStepInfo
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ListsResource provides access to lists resources.
-type ListsResource struct {
-	client *Client
-}
-
-
-
-// SubscribeToList 
-func (r *ListsResource) SubscribeToList(ctx context.Context, slug string, request *SubscribeRequest) (*Response, error) {
-	path := fmt.Sprintf("/sdk/v1/lists/%s/subscribe", slug)
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// UnsubscribeFromList 
-func (r *ListsResource) UnsubscribeFromList(ctx context.Context, slug string, request *SubscribeRequest) (*Response, error) {
-	path := fmt.Sprintf("/sdk/v1/lists/%s/unsubscribe", slug)
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// OrdersResource provides access to orders resources.
-type OrdersResource struct {
-	client *Client
-}
-
-
-
-// CreateOrder 
-func (r *OrdersResource) CreateOrder(ctx context.Context, request *OrderRequest) (*OrderResponse, error) {
-	var result OrderResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/orders",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// EmailsResource provides access to emails resources.
-type EmailsResource struct {
-	client *Client
-}
-
-
-
-// SendEmail 
-func (r *EmailsResource) SendEmail(ctx context.Context, request *SendEmailRequest) (*SendEmailResponse, error) {
-	var result SendEmailResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/emails/",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GetEmailStatus 
-func (r *EmailsResource) GetEmailStatus(ctx context.Context, messageId string) (*EmailStatusResponse, error) {
-	path := fmt.Sprintf("/sdk/v1/emails/%s", messageId)
-	var result EmailStatusResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ListEmailEvents 
-func (r *EmailsResource) ListEmailEvents(ctx context.Context, messageId string) (*ListEmailEventsResponse, error) {
-	path := fmt.Sprintf("/sdk/v1/emails/%s/events", messageId)
-	var result ListEmailEventsResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
 		nil,
 		&result,
 	)
@@ -767,202 +684,17 @@ func (r *WebhooksResource) TestWebhook(ctx context.Context, id string) (*TestWeb
 
 
 
-// AuthResource provides access to auth resources.
-type AuthResource struct {
+// WorkshopsResource provides access to workshops resources.
+type WorkshopsResource struct {
 	client *Client
 }
 
 
 
-// ChangePassword 
-func (r *AuthResource) ChangePassword(ctx context.Context, request *SDKChangePasswordRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/change-password",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ForgotPassword 
-func (r *AuthResource) ForgotPassword(ctx context.Context, request *SDKForgotPasswordRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/forgot-password",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Login 
-func (r *AuthResource) Login(ctx context.Context, request *SDKLoginRequest) (*SDKAuthResponse, error) {
-	var result SDKAuthResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/login",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// RefreshToken 
-func (r *AuthResource) RefreshToken(ctx context.Context, request *SDKRefreshTokenRequest) (*SDKAuthResponse, error) {
-	var result SDKAuthResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/refresh",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Register 
-func (r *AuthResource) Register(ctx context.Context, request *SDKRegisterRequest) (*SDKAuthResponse, error) {
-	var result SDKAuthResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/register",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ResetPassword 
-func (r *AuthResource) ResetPassword(ctx context.Context, request *SDKResetPasswordRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/reset-password",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// VerifyEmail 
-func (r *AuthResource) VerifyEmail(ctx context.Context, request *SDKVerifyEmailRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/auth/verify-email",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ContentResource provides access to content resources.
-type ContentResource struct {
-	client *Client
-}
-
-
-
-// ListContentCategories 
-func (r *ContentResource) ListContentCategories(ctx context.Context) (*ListSDKContentCategoriesResponse, error) {
-	var result ListSDKContentCategoriesResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		"/sdk/v1/content/categories",
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ListContentPages 
-func (r *ContentResource) ListContentPages(ctx context.Context, page int, pageSize int) (*ListSDKContentPagesResponse, error) {
-	query := url.Values{}
-	if page != 0 {
-		query.Set("page", strconv.Itoa(page))
-	}
-	if pageSize != 0 {
-		query.Set("page_size", strconv.Itoa(pageSize))
-	}
-	var result ListSDKContentPagesResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		"/sdk/v1/content/pages",
-		query,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GetContentPage 
-func (r *ContentResource) GetContentPage(ctx context.Context, slug string) (*SDKContentPageInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/content/pages/%s", slug)
-	var result SDKContentPageInfo
+// GetWorkshop 
+func (r *WorkshopsResource) GetWorkshop(ctx context.Context, slug string) (*WorkshopEventInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/workshops/%s", slug)
+	var result WorkshopEventInfo
 	err := r.client.request(
 		ctx,
 		"GET",
@@ -979,24 +711,15 @@ func (r *ContentResource) GetContentPage(ctx context.Context, slug string) (*SDK
 
 
 
-// ListContentPosts 
-func (r *ContentResource) ListContentPosts(ctx context.Context, page int, pageSize int, categorySlug string) (*ListSDKContentPostsResponse, error) {
-	query := url.Values{}
-	if page != 0 {
-		query.Set("page", strconv.Itoa(page))
-	}
-	if pageSize != 0 {
-		query.Set("page_size", strconv.Itoa(pageSize))
-	}
-	if categorySlug != "" {
-		query.Set("category", categorySlug)
-	}
-	var result ListSDKContentPostsResponse
+// GetWorkshopByProduct 
+func (r *WorkshopsResource) GetWorkshopByProduct(ctx context.Context, productSlug string) (*WorkshopEventInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/workshops/product/%s", productSlug)
+	var result WorkshopEventInfo
 	err := r.client.request(
 		ctx,
 		"GET",
-		"/sdk/v1/content/posts",
-		query,
+		path,
+		nil,
 		nil,
 		&result,
 	)
@@ -1008,16 +731,118 @@ func (r *ContentResource) ListContentPosts(ctx context.Context, page int, pageSi
 
 
 
-// GetContentPost 
-func (r *ContentResource) GetContentPost(ctx context.Context, slug string) (*SDKContentPostInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/content/posts/%s", slug)
-	var result SDKContentPostInfo
+// BillingResource provides access to billing resources.
+type BillingResource struct {
+	client *Client
+}
+
+
+
+// CreateCheckoutSession 
+func (r *BillingResource) CreateCheckoutSession(ctx context.Context, request *CheckoutRequest) (*CheckoutResponse, error) {
+	var result CheckoutResponse
 	err := r.client.request(
 		ctx,
-		"GET",
+		"POST",
+		"/sdk/v1/billing/checkout",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// CreateCustomer 
+func (r *BillingResource) CreateCustomer(ctx context.Context, request *CustomerRequest) (*CustomerResponse, error) {
+	var result CustomerResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/billing/customers",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GetCustomerPortal 
+func (r *BillingResource) GetCustomerPortal(ctx context.Context, request *PortalRequest) (*PortalResponse, error) {
+	var result PortalResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/billing/portal",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// CreateSubscription 
+func (r *BillingResource) CreateSubscription(ctx context.Context, request *SubscriptionRequest) (*SubscriptionResponse, error) {
+	var result SubscriptionResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/billing/subscriptions",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// CancelSubscription 
+func (r *BillingResource) CancelSubscription(ctx context.Context, id string) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/billing/subscriptions/%s/cancel", id)
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
 		path,
 		nil,
 		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// RecordUsage 
+func (r *BillingResource) RecordUsage(ctx context.Context, request *UsageRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/billing/usage",
+		nil,
+		request,
 		&result,
 	)
 	if err != nil {
@@ -1299,273 +1124,6 @@ func (r *CustomersResource) ListCustomerSubscriptionsById(ctx context.Context, i
 
 
 
-// ContactsResource provides access to contacts resources.
-type ContactsResource struct {
-	client *Client
-}
-
-
-
-// CreateContact 
-func (r *ContactsResource) CreateContact(ctx context.Context, request *ContactRequest) (*ContactResponse, error) {
-	var result ContactResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/contacts",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GetContact 
-func (r *ContactsResource) GetContact(ctx context.Context, id string) (*SDKContactInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/contacts/%s", id)
-	var result SDKContactInfo
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// UpdateContact 
-func (r *ContactsResource) UpdateContact(ctx context.Context, id string, request *UpdateContactRequest) (*SDKContactInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/contacts/%s", id)
-	var result SDKContactInfo
-	err := r.client.request(
-		ctx,
-		"PUT",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// ListContactActivity 
-func (r *ContactsResource) ListContactActivity(ctx context.Context, id string, limit int) (*ListContactActivityResponse, error) {
-	path := fmt.Sprintf("/sdk/v1/contacts/%s/activity", id)
-	query := url.Values{}
-	if limit != 0 {
-		query.Set("limit", strconv.Itoa(limit))
-	}
-	var result ListContactActivityResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		query,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// AddContactTags 
-func (r *ContactsResource) AddContactTags(ctx context.Context, id string, request *AddContactTagsRequest) (*Response, error) {
-	path := fmt.Sprintf("/sdk/v1/contacts/%s/tags", id)
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// RemoveContactTags 
-func (r *ContactsResource) RemoveContactTags(ctx context.Context, id string, request *RemoveContactTagsRequest) (*Response, error) {
-	path := fmt.Sprintf("/sdk/v1/contacts/%s/tags", id)
-	var result Response
-	err := r.client.request(
-		ctx,
-		"DELETE",
-		path,
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GlobalUnsubscribe 
-func (r *ContactsResource) GlobalUnsubscribe(ctx context.Context, request *GlobalUnsubscribeRequest) (*Response, error) {
-	var result Response
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/contacts/unsubscribe",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// OffersResource provides access to offers resources.
-type OffersResource struct {
-	client *Client
-}
-
-
-
-// ProcessOffer 
-func (r *OffersResource) ProcessOffer(ctx context.Context, request *OfferRequest) (*OfferResponse, error) {
-	var result OfferResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/offers",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// WorkshopsResource provides access to workshops resources.
-type WorkshopsResource struct {
-	client *Client
-}
-
-
-
-// GetWorkshop 
-func (r *WorkshopsResource) GetWorkshop(ctx context.Context, slug string) (*WorkshopEventInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/workshops/%s", slug)
-	var result WorkshopEventInfo
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// GetWorkshopByProduct 
-func (r *WorkshopsResource) GetWorkshopByProduct(ctx context.Context, productSlug string) (*WorkshopEventInfo, error) {
-	path := fmt.Sprintf("/sdk/v1/workshops/product/%s", productSlug)
-	var result WorkshopEventInfo
-	err := r.client.request(
-		ctx,
-		"GET",
-		path,
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// LlmResource provides access to llm resources.
-type LlmResource struct {
-	client *Client
-}
-
-
-
-// Chat 
-func (r *LlmResource) Chat(ctx context.Context, request *LLMChatRequest) (*LLMChatResponse, error) {
-	var result LLMChatResponse
-	err := r.client.request(
-		ctx,
-		"POST",
-		"/sdk/v1/llm/chat",
-		nil,
-		request,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Config 
-func (r *LlmResource) Config(ctx context.Context) (*LLMConfigResponse, error) {
-	var result LLMConfigResponse
-	err := r.client.request(
-		ctx,
-		"GET",
-		"/sdk/v1/llm/config",
-		nil,
-		nil,
-		&result,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
 // SequencesResource provides access to sequences resources.
 type SequencesResource struct {
 	client *Client
@@ -1781,6 +1339,253 @@ func (r *SiteResource) GetSiteSettings(ctx context.Context) (*SDKSiteSettings, e
 
 
 
+// EventsResource provides access to events resources.
+type EventsResource struct {
+	client *Client
+}
+
+
+
+// TrackEvent 
+func (r *EventsResource) TrackEvent(ctx context.Context, request *EventRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/events",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// OffersResource provides access to offers resources.
+type OffersResource struct {
+	client *Client
+}
+
+
+
+// ProcessOffer 
+func (r *OffersResource) ProcessOffer(ctx context.Context, request *OfferRequest) (*OfferResponse, error) {
+	var result OfferResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/offers",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ProductsResource provides access to products resources.
+type ProductsResource struct {
+	client *Client
+}
+
+
+
+// GetProduct 
+func (r *ProductsResource) GetProduct(ctx context.Context, slug string) (*BillingProductInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/products/%s", slug)
+	var result BillingProductInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// QuizzesResource provides access to quizzes resources.
+type QuizzesResource struct {
+	client *Client
+}
+
+
+
+// GetQuiz 
+func (r *QuizzesResource) GetQuiz(ctx context.Context, slug string) (*QuizInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/quizzes/%s", slug)
+	var result QuizInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// SubmitQuiz 
+func (r *QuizzesResource) SubmitQuiz(ctx context.Context, slug string, request *QuizSubmitRequest) (*QuizSubmitResponse, error) {
+	path := fmt.Sprintf("/sdk/v1/quizzes/%s/submit", slug)
+	var result QuizSubmitResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ContentResource provides access to content resources.
+type ContentResource struct {
+	client *Client
+}
+
+
+
+// ListContentCategories 
+func (r *ContentResource) ListContentCategories(ctx context.Context) (*ListSDKContentCategoriesResponse, error) {
+	var result ListSDKContentCategoriesResponse
+	err := r.client.request(
+		ctx,
+		"GET",
+		"/sdk/v1/content/categories",
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ListContentPages 
+func (r *ContentResource) ListContentPages(ctx context.Context, page int, pageSize int) (*ListSDKContentPagesResponse, error) {
+	query := url.Values{}
+	if page != 0 {
+		query.Set("page", strconv.Itoa(page))
+	}
+	if pageSize != 0 {
+		query.Set("page_size", strconv.Itoa(pageSize))
+	}
+	var result ListSDKContentPagesResponse
+	err := r.client.request(
+		ctx,
+		"GET",
+		"/sdk/v1/content/pages",
+		query,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GetContentPage 
+func (r *ContentResource) GetContentPage(ctx context.Context, slug string) (*SDKContentPageInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/content/pages/%s", slug)
+	var result SDKContentPageInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ListContentPosts 
+func (r *ContentResource) ListContentPosts(ctx context.Context, page int, pageSize int, categorySlug string) (*ListSDKContentPostsResponse, error) {
+	query := url.Values{}
+	if page != 0 {
+		query.Set("page", strconv.Itoa(page))
+	}
+	if pageSize != 0 {
+		query.Set("page_size", strconv.Itoa(pageSize))
+	}
+	if categorySlug != "" {
+		query.Set("category", categorySlug)
+	}
+	var result ListSDKContentPostsResponse
+	err := r.client.request(
+		ctx,
+		"GET",
+		"/sdk/v1/content/posts",
+		query,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GetContentPost 
+func (r *ContentResource) GetContentPost(ctx context.Context, slug string) (*SDKContentPostInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/content/posts/%s", slug)
+	var result SDKContentPostInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
 // TrackingResource provides access to tracking resources.
 type TrackingResource struct {
 	client *Client
@@ -1864,22 +1669,217 @@ func (r *TrackingResource) TrackUnsubscribe(ctx context.Context, request *TrackU
 
 
 
-// EventsResource provides access to events resources.
-type EventsResource struct {
+// ContactsResource provides access to contacts resources.
+type ContactsResource struct {
 	client *Client
 }
 
 
 
-// TrackEvent 
-func (r *EventsResource) TrackEvent(ctx context.Context, request *EventRequest) (*Response, error) {
+// CreateContact 
+func (r *ContactsResource) CreateContact(ctx context.Context, request *ContactRequest) (*ContactResponse, error) {
+	var result ContactResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/contacts",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GetContact 
+func (r *ContactsResource) GetContact(ctx context.Context, id string) (*SDKContactInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/contacts/%s", id)
+	var result SDKContactInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// UpdateContact 
+func (r *ContactsResource) UpdateContact(ctx context.Context, id string, request *UpdateContactRequest) (*SDKContactInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/contacts/%s", id)
+	var result SDKContactInfo
+	err := r.client.request(
+		ctx,
+		"PUT",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// ListContactActivity 
+func (r *ContactsResource) ListContactActivity(ctx context.Context, id string, limit int) (*ListContactActivityResponse, error) {
+	path := fmt.Sprintf("/sdk/v1/contacts/%s/activity", id)
+	query := url.Values{}
+	if limit != 0 {
+		query.Set("limit", strconv.Itoa(limit))
+	}
+	var result ListContactActivityResponse
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		query,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// AddContactTags 
+func (r *ContactsResource) AddContactTags(ctx context.Context, id string, request *AddContactTagsRequest) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/contacts/%s/tags", id)
 	var result Response
 	err := r.client.request(
 		ctx,
 		"POST",
-		"/sdk/v1/events",
+		path,
 		nil,
 		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// RemoveContactTags 
+func (r *ContactsResource) RemoveContactTags(ctx context.Context, id string, request *RemoveContactTagsRequest) (*Response, error) {
+	path := fmt.Sprintf("/sdk/v1/contacts/%s/tags", id)
+	var result Response
+	err := r.client.request(
+		ctx,
+		"DELETE",
+		path,
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// GlobalUnsubscribe 
+func (r *ContactsResource) GlobalUnsubscribe(ctx context.Context, request *GlobalUnsubscribeRequest) (*Response, error) {
+	var result Response
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/contacts/unsubscribe",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// FunnelsResource provides access to funnels resources.
+type FunnelsResource struct {
+	client *Client
+}
+
+
+
+// GetFunnelStep 
+func (r *FunnelsResource) GetFunnelStep(ctx context.Context, slug string) (*FunnelStepInfo, error) {
+	path := fmt.Sprintf("/sdk/v1/funnels/%s", slug)
+	var result FunnelStepInfo
+	err := r.client.request(
+		ctx,
+		"GET",
+		path,
+		nil,
+		nil,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// LlmResource provides access to llm resources.
+type LlmResource struct {
+	client *Client
+}
+
+
+
+// Chat 
+func (r *LlmResource) Chat(ctx context.Context, request *LLMChatRequest) (*LLMChatResponse, error) {
+	var result LLMChatResponse
+	err := r.client.request(
+		ctx,
+		"POST",
+		"/sdk/v1/llm/chat",
+		nil,
+		request,
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+
+
+// Config 
+func (r *LlmResource) Config(ctx context.Context) (*LLMConfigResponse, error) {
+	var result LLMConfigResponse
+	err := r.client.request(
+		ctx,
+		"GET",
+		"/sdk/v1/llm/config",
+		nil,
+		nil,
 		&result,
 	)
 	if err != nil {
