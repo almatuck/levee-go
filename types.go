@@ -3,6 +3,24 @@
 package levee
 
 
+// AcceptInviteRequest represents the AcceptInviteRequest type.
+type AcceptInviteRequest struct {
+	Token string `json:"token"`
+	Password string `json:"password,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
+
+// AcceptInviteResponse represents the AcceptInviteResponse type.
+type AcceptInviteResponse struct {
+	Message string `json:"message"`
+	OrgID string `json:"org_id"`
+	OrgName string `json:"org_name"`
+	OrgSlug string `json:"org_slug"`
+	Role string `json:"role"`
+}
+
+
 // AddContactTagsRequest represents the AddContactTagsRequest type.
 type AddContactTagsRequest struct {
 	Tags []string `json:"tags"`
@@ -1142,6 +1160,17 @@ type UpdateWebhookRequest struct {
 type UsageRequest struct {
 	SubscriptionItemID string `json:"subscription_item_id"`
 	Quantity int `json:"quantity"`
+}
+
+
+// ValidateInviteTokenResponse represents the ValidateInviteTokenResponse type.
+type ValidateInviteTokenResponse struct {
+	Valid bool `json:"valid"`
+	OrgName string `json:"org_name,omitempty"`
+	InviterName string `json:"inviter_name,omitempty"`
+	Email string `json:"email,omitempty"`
+	Role string `json:"role,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 
