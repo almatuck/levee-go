@@ -729,6 +729,24 @@ type OrderResponse struct {
 }
 
 
+// OrgMember represents the OrgMember type.
+type OrgMember struct {
+	ID string `json:"id"`
+	Email string `json:"email"`
+	Name string `json:"name"`
+	AvatarUrl string `json:"avatar_url,omitempty"`
+	Role string `json:"role"`
+	JoinedAt string `json:"joined_at"`
+}
+
+
+// OrgMembersResponse represents the OrgMembersResponse type.
+type OrgMembersResponse struct {
+	Members []OrgMember `json:"members"`
+	Total int `json:"total"`
+}
+
+
 // PauseSequenceRequest represents the PauseSequenceRequest type.
 type PauseSequenceRequest struct {
 	Email string `json:"email"`
@@ -910,6 +928,13 @@ type SDKForgotPasswordRequest struct {
 }
 
 
+// SDKInviteTeamMemberRequest represents the SDKInviteTeamMemberRequest type.
+type SDKInviteTeamMemberRequest struct {
+	Email string `json:"email"`
+	Role string `json:"role"`
+}
+
+
 // SDKLoginRequest represents the SDKLoginRequest type.
 type SDKLoginRequest struct {
 	Email string `json:"email"`
@@ -965,6 +990,12 @@ type SDKUpdateCustomerRequest struct {
 	AvatarUrl string `json:"avatar_url,omitempty"`
 	Status string `json:"status,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
+}
+
+
+// SDKUpdateTeamMemberRoleRequest represents the SDKUpdateTeamMemberRoleRequest type.
+type SDKUpdateTeamMemberRoleRequest struct {
+	NewRole string `json:"new_role"`
 }
 
 
